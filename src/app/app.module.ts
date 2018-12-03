@@ -2,8 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-
-import {MaterialModule} from './material.module';
+import { TreeTableModule } from './tree-table/tree-table.module';
 
 import { AppComponent } from './app.component';
 
@@ -14,8 +13,9 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    MaterialModule,
+    TreeTableModule
   ],
+  
   providers: [],
   bootstrap: [AppComponent]
 })
