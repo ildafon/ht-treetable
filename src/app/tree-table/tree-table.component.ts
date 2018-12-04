@@ -4,6 +4,7 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import { TreeTableDatasource, TableItem } from './tree-table-datasource';
 
 import { MatPaginator, MatSort} from '@angular/material';
+import { Observable } from 'rxjs';
 
 
 @Component({
@@ -19,16 +20,20 @@ import { MatPaginator, MatSort} from '@angular/material';
   ]
 })
 export class TreeTableComponent implements OnInit {
-  @Input() inputData: Object;
-  columnsToDisplay: string[]  = ['id', 'name'];
+  @Input() inputData: Observable<any>;
+  columnsToDisplay: string[];
   dataSource: TreeTableDatasource;
-
+  result;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
+  constructor(){
+    this.inputData.subscribe(data => this.result = data)
+  }
 
   ngOnInit() {
-    this.dataSource = new TreeTableDatasource(this.inputData, this.paginator, this.sort);
+    this.dataSource = new TreeTableDatasource(this.result, this.paginator, this.sort, this.columnsToDisplay);
+    
   }
 
   applyFilter(filterValue: string) {

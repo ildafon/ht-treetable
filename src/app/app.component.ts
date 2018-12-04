@@ -1,10 +1,17 @@
-import { Component } from '@angular/core';
-import { TableItem, EXAMPLE_DATA } from './tree-table/tree-table-datasource';
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { TableItem } from './tree-table/tree-table-datasource';
+import { LocalService } from './services/local.service';
+import { RemoteService } from './services/remote.service';
+
 @Component({
   selector: 'ht-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  providers: [ 
+    {provide: LocalService, useClass: LocalService},
+  ]
 })
-export class AppComponent {
-  source: TableItem[] = EXAMPLE_DATA;
+export class AppComponent{
 }

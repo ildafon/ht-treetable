@@ -8,52 +8,30 @@ export interface TableItem {
     id: number;
   }
   
-  // TODO: replace this with real data from your application
-  export const EXAMPLE_DATA: TableItem[] = [
-    {id: 1, name: 'Hydrogen'},
-    {id: 2, name: 'Helium'},
-    {id: 3, name: 'Lithium'},
-    {id: 4, name: 'Beryllium'},
-    {id: 5, name: 'Boron'},
-    {id: 6, name: 'Carbon'},
-    {id: 7, name: 'Nitrogen'},
-    {id: 8, name: 'Oxygen'},
-    {id: 9, name: 'Fluorine'},
-    {id: 10, name: 'Neon'},
-    {id: 11, name: 'Sodium'},
-    {id: 12, name: 'Magnesium'},
-    {id: 13, name: 'Aluminum'},
-    {id: 14, name: 'Silicon'},
-    {id: 15, name: 'Phosphorus'},
-    {id: 16, name: 'Sulfur'},
-    {id: 17, name: 'Chlorine'},
-    {id: 18, name: 'Argon'},
-    {id: 19, name: 'Potassium'},
-    {id: 20, name: 'Calcium'},
-  ];
 
 export class TreeTableDatasource extends DataSource<TableItem> {
     data: TableItem[];
 
-    
-
     filter: string;
 
-    constructor(private inputData, public paginator: MatPaginator, private sort: MatSort){
-        super();
-        this.data = inputData;
-    }
+    constructor(private inputData, public paginator: MatPaginator, private sort: MatSort, public columnsToDisplay: string[]){
+        super();  
+        console.log(inputData)
+        this.data = inputData;         
+    } 
 
     connect(): Observable<TableItem[]>{
         const dataMutations = [
-            observableOf(this.inputData),
+            observableOf(this.data),
             this.paginator.page,
             this.sort.sortChange
         ];
 
+        this.columnsToDisplay = Object.keys(this.data[0]);
         this.paginator.length = this.data.length;
 
-        return merge(...dataMutations).pipe(map(() => {
+        return merge(...dataMutations)
+        .pipe(map( () => {
             return this.getPagedData([...this.data]);
         }));
     }
