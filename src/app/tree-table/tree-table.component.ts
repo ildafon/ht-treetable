@@ -21,7 +21,7 @@ import { LocalService} from '../services/local.service';
 })
 export class TreeTableComponent implements OnInit {
   
-  columnsToDisplay: string[];
+  columnsToDisplay: string[] = ['name'];
   dataSource: TreeTableDatasource;
   
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -31,7 +31,7 @@ export class TreeTableComponent implements OnInit {
   
 
   ngOnInit() {
-    this.dataSource = new TreeTableDatasource(this.dataService, this.paginator, this.sort, this.columnsToDisplay);
+    this.dataSource = new TreeTableDatasource(this.dataService, this.paginator, this.sort);
     
   }
 

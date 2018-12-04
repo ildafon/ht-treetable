@@ -15,7 +15,7 @@ export class TreeTableDatasource extends DataSource<TableItem> {
 
     filter: string;
 
-    constructor(private dataService: LocalService, public paginator: MatPaginator, private sort: MatSort, public columnsToDisplay: string[]){
+    constructor(private dataService: LocalService, public paginator: MatPaginator, private sort: MatSort){
         super();        
     } 
 
@@ -25,7 +25,7 @@ export class TreeTableDatasource extends DataSource<TableItem> {
             this.sort.sortChange
         ];
 
-        this.columnsToDisplay = Object.keys(this.data[0]);
+        
         this.paginator.length = this.data.length;
 
         return merge(...dataMutations)
