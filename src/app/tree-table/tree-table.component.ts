@@ -118,25 +118,28 @@ export class TreeTableComponent implements OnInit {
     // this.data = this.treeToRows(this.tree);
     // this.sourceRows = this.getSourceRows(TREE_DATA2);
 
-    merge(this.sort.sortChange, this.paginator.page)
+    this.dataService.getData()
     .pipe(
-      startWith({}),
-      switchMap(() => {
-        this.isLoadingResults = true;
-        return this.dataService.getData();
-      }),
-      map(data => {
+      map( data => {
         this.isLoadingResults = false;
-        this.resultsLength = this.sourceRows.length;
-
         return this.getSourceRows(data.items);
+      })
+    )
+    .subscribe(data => this.sourceRows = data);
+   
+    merge( observableOf(this.sourceRows),this.sort.sortChange, this.paginator.page)
+    .pipe(
+      map(() => {  
+        return this.transorm(this.rowsToTree([...this.sourceRows], '0'))  
       }),
       catchError(() => {
         this.isLoadingResults = false;
-        
         return observableOf([]);
       })
-    ).subscribe(data => this.sourceRows = data);
+    ).subscribe(data => { 
+        this.data = data;
+        this.resultsLength = data.length;
+      });
 
 
 
@@ -169,32 +172,33 @@ export class TreeTableComponent implements OnInit {
   
 
 
-  rowToTree(obj: any[], level: string): TreeItemNode[] {
+  rowsToTree(obj: TreeItemNode[], level: string): TreeItemNode[] {
     return obj.filter(o =>
       (<string>o.code).startsWith(level + '.')
       && (o.code.match(/\./g) || []).length === (level.match(/\./g) || []).length + 1
     )
-      .map(o => {
-        const node = new TreeItemNode();
-        node.item = o.text;
-        node.code = o.code;
-        node.expanded = false;
-        const children = obj.filter(so => (<string>so.code).startsWith(level + '.'));
-        if (children && children.length > 0) {
-          node.children = this.rowToTree(children, o.code);
+      .map(node => {
+        if (node.expanded) {
+          const children = obj.filter(so => (<string>so.code).startsWith(level + '.'));
+          if (children && children.length > 0) {
+            node.children = this.rowsToTree(children, node.code);
+          } else {
+            // async extention 
+          }
         }
+               
         return node;
       });
   }
 
-  treeToRows(tree, rows = []) {
+  transorm(tree, rows = []) {
     if (!tree.length) return tree;
     return tree.reduce(
       (acc, node) => {
         if (node.children && node.children.length > 0) {
           acc.push({text: node.item, code: node.code, exp: true});
-          if (node.node_check) {
-            this.treeToRows(node.children, rows);
+          if (node.expanded) {
+            this.transorm(node.children, rows);
           } 
             
         } else {
@@ -207,12 +211,13 @@ export class TreeTableComponent implements OnInit {
   };
 
   expandClick(row) {
-    row.exp = !row.exp
-    this.data = this.treeToRows(this.tree);  // hack to trigger filter refresh
+    console.log(row);
+    row.expanded = !row.expanded
+    // this.data = this.treeToRows(this.tree);  // hack to trigger filter refresh
   }  
 
 isExpand(index, item): boolean{
-  return item.exp;
+  return Object.keys(item).indexOf('expanded') > -1;
 }
 
 
