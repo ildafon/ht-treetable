@@ -125,6 +125,7 @@ export class TreeTableComponent implements OnInit {
       
       Object.assign([], filteredTreeData).forEach(ftd => {
         let str = (<string>ftd.code);
+        
         while (str.lastIndexOf('.') > -1) {
           const index = str.lastIndexOf('.');
           str = str.substring(0, index);
@@ -132,6 +133,7 @@ export class TreeTableComponent implements OnInit {
             const obj = this.sourceRows.find(d => d.code === str);
             if (obj) {
               filteredTreeData.push(obj);
+              console.log('filteredTreeData', filteredTreeData)
             }
           }
         }
@@ -188,11 +190,11 @@ export class TreeTableComponent implements OnInit {
   };
 
   expandClick(row) {
-    console.log('click', row);
+    
     this.sourceRows.filter( (node: TreeItemNode) => node.item == row.text)
     .map(row => {
 
-      console.log(row);
+      
       return row.expanded = !row.expanded;
     } );
     
@@ -201,7 +203,7 @@ export class TreeTableComponent implements OnInit {
   }  
 
   isExpand(index, item): boolean{
-    console.log(item)
+    
     return item.isExpandable;
   }
 
