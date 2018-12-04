@@ -52,14 +52,16 @@
         </table>
     </div>
     <mat-paginator #paginator
-            [length]="data.length"
+            [length]="this.resultsLength"
             [pageIndex]="0"
             [pageSize]="5"
             [pageSizeOptions]="[5, 25, 50, 100, 250]">
         </mat-paginator>
 </div>  
 
-{{ tree | json }}
+<!-- {{ tree | json }}
 <br>
 <br>
-{{ data | json}}
+{{ data | json}} -->
+
+{{ sourceRows | json }}
