@@ -2,6 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 import {Observable, of as observableOf, merge} from 'rxjs';
 import { map } from 'rxjs/operators';
 import { MatPaginator, MatSort } from '@angular/material';
+import { LocalService } from '../services/local.service';
 
 export interface TableItem {
     name: string;
@@ -10,19 +11,16 @@ export interface TableItem {
   
 
 export class TreeTableDatasource extends DataSource<TableItem> {
-    data: TableItem[];
+    data: TableItem[] = [];
 
     filter: string;
 
-    constructor(private inputData, public paginator: MatPaginator, private sort: MatSort, public columnsToDisplay: string[]){
-        super();  
-        console.log(inputData)
-        this.data = inputData;         
+    constructor(private dataService: LocalService, public paginator: MatPaginator, private sort: MatSort, public columnsToDisplay: string[]){
+        super();        
     } 
 
     connect(): Observable<TableItem[]>{
         const dataMutations = [
-            observableOf(this.data),
             this.paginator.page,
             this.sort.sortChange
         ];

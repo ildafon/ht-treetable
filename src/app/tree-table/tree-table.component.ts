@@ -5,7 +5,7 @@ import { TreeTableDatasource, TableItem } from './tree-table-datasource';
 
 import { MatPaginator, MatSort} from '@angular/material';
 import { Observable } from 'rxjs';
-
+import { LocalService} from '../services/local.service';
 
 @Component({
   selector: 'ht-tree-table',
@@ -20,19 +20,18 @@ import { Observable } from 'rxjs';
   ]
 })
 export class TreeTableComponent implements OnInit {
-  @Input() inputData: Observable<any>;
+  
   columnsToDisplay: string[];
   dataSource: TreeTableDatasource;
-  result;
+  
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(){
-    this.inputData.subscribe(data => this.result = data)
-  }
+  constructor(private dataService: LocalService) {}
+  
 
   ngOnInit() {
-    this.dataSource = new TreeTableDatasource(this.result, this.paginator, this.sort, this.columnsToDisplay);
+    this.dataSource = new TreeTableDatasource(this.dataService, this.paginator, this.sort, this.columnsToDisplay);
     
   }
 
