@@ -8,10 +8,7 @@ import { RemoteService } from './services/remote.service';
 @Component({
   selector: 'ht-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  providers: [ 
-    {provide: LocalService, useClass: LocalService},
-  ]
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent{
 }

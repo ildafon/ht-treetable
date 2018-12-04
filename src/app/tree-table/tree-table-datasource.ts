@@ -2,7 +2,7 @@ import { DataSource } from '@angular/cdk/collections';
 import {Observable, of as observableOf, merge} from 'rxjs';
 import { map } from 'rxjs/operators';
 import { MatPaginator, MatSort } from '@angular/material';
-import { LocalService } from '../services/local.service';
+
 
 export interface TableItem {
     name: string;
@@ -15,7 +15,7 @@ export class TreeTableDatasource extends DataSource<TableItem> {
 
     filter: string;
 
-    constructor(private dataService: LocalService, public paginator: MatPaginator, private sort: MatSort){
+    constructor(public paginator: MatPaginator, private sort: MatSort){
         super();        
     } 
 
