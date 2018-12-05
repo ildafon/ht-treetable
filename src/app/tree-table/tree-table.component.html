@@ -25,7 +25,7 @@
 
                 <ng-container matColumnDef="text">
                     <th mat-header-cell *matHeaderCellDef > Text </th>
-                    <td [style.padding-left.px]="36 * element.level" mat-cell *matCellDef="let element"> {{element.text}} </td>
+                    <td [style.padding-left.px]="36 * element.level" mat-cell *matCellDef="let element" [innerHTML]="element.text | highlight: filterText"></td>
                 </ng-container>
 
 

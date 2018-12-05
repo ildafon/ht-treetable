@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { TreeTableComponent } from './tree-table.component';
 import { MaterialModule } from '../material.module';
 
+import { HighlightPipe } from '../pipes/highlight.pipe';
 @NgModule({
-  declarations: [TreeTableComponent],
+  declarations: [TreeTableComponent, HighlightPipe],
   imports: [
     CommonModule,
     MaterialModule

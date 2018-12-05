@@ -47,6 +47,7 @@ export class TreeTableComponent implements OnInit {
   
   resultsLength = 0;
   isLoadingResults = false;
+  filterText: string;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -126,12 +127,16 @@ export class TreeTableComponent implements OnInit {
     );
   };
   
-  filteredToTree(filterText: string) {
+  filteredToTree(filterText: string = this.filterText) {
     let filteredTreeData;
     if (filterText) {
       
       filteredTreeData = 
-        this.sourceRows.filter(d => d.item.toLocaleLowerCase().indexOf(filterText.toLocaleLowerCase()) > -1)
+        this.sourceRows.filter(d => {
+          if (d.item.toLocaleLowerCase().indexOf(filterText.toLocaleLowerCase()) > -1){
+            return d;
+          }
+        })
         .map(d => {
           if (d.isExpandable) d.expanded=true
           return d;
@@ -233,7 +238,8 @@ export class TreeTableComponent implements OnInit {
   }
 
   filterChanged(filterText: string) {
-    this.filteredToTree(filterText);
+    this.filterText = filterText
+    this.filteredToTree();
   }
 }
 
