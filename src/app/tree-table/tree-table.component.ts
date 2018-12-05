@@ -77,11 +77,11 @@ export class TreeTableComponent implements OnInit {
         return observableOf(this.sourceRows);
     }),
       map((rows) => {  
-        console.log('rows', rows);
+        // console.log('rows', rows);
         return this.sourceRowsToTree(rows, '0')  
       }),
       map((sourceTree) => {  
-        console.log('sourceTree', sourceTree);
+        // console.log('sourceTree', sourceTree);
         return this.treeToTable(sourceTree)  
       }),
       catchError(() => {
@@ -90,7 +90,7 @@ export class TreeTableComponent implements OnInit {
       })
     ).subscribe( rowsToDisplay => { 
         this.data = rowsToDisplay;
-          console.log('rowsToDisplay', rowsToDisplay);
+          // console.log('rowsToDisplay', rowsToDisplay);
         this.resultsLength = this.data.length;
       });
   }
@@ -212,29 +212,18 @@ export class TreeTableComponent implements OnInit {
   };
 
   expandClick(row) {
-    console.log('before expand this.sourceRows', this.sourceRows);
     const rowToExpand = this.sourceRows.findIndex(x => x.id === row.id);
-    
-    // this.sourceRows[rowToExpand].expanded = true;
-    console.log('after expand this.sourceRows', this.sourceRows);
-    console.log('rowToExpand', rowToExpand);
-    // this.sourceRows.filter( (node: TreeItemNode) => node.item == row.text)
-    // .map(row => {
-    //   return row.expanded = !row.expanded;
-    // } );
-    
-    // this.table.renderRows();
-    // this.data = this.treeToRows(this.tree);  // hack to trigger filter refresh
+    let expandedProp = this.sourceRows[rowToExpand].expanded;
+    this.sourceRows[rowToExpand].expanded = !expandedProp
+    this.sourceRows = this.sourceRows.slice(0);
   }  
 
   isExpand(index, item): boolean{
-    
     return item.isExpandable;
   }
 
   filterChanged(filterText: string) {
     this.filter(filterText);
-    
   }
 }
 
