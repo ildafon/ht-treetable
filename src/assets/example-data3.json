@@ -1,64 +1,183 @@
 [{
-  "id": "1520dc51-8a39-4c93-b9f4-a82f5d480014",
+  "id": "3a30efaf-7a1a-4123-adc1-ed08be7b2672",
   "item": "Turkiye",
   "code": "0.1",
   "level": 1,
   "isExpandable": true,
-  "expanded": false
+  "expanded": false,
+  "children": [{
+    "id": "da2f4215-e53b-48d3-a278-ac9f1c4fe7c5",
+    "item": "İstanbul",
+    "code": "0.1.1",
+    "level": 2,
+    "isExpandable": true,
+    "expanded": false,
+    "children": [{
+      "id": "0f236b2e-be00-47d3-a7e2-eaa0c186c006",
+      "item": "Beykoz",
+      "code": "0.1.1.1",
+      "level": 3,
+      "children": []
+    }, {
+      "id": "67ae9e18-f2f1-422b-8f76-0c5bad381cb7",
+      "item": "Fatih",
+      "code": "0.1.1.1",
+      "level": 3,
+      "children": []
+    }]
+  }, {
+    "id": "a7d85bd7-7ea5-4895-bebf-d9187d1229a9",
+    "item": "Ankara",
+    "code": "0.1.2",
+    "level": 2,
+    "isExpandable": true,
+    "expanded": false,
+    "children": [{
+      "id": "bdbcfacb-05bc-4f03-afe9-be13bacf8bfd",
+      "item": "Cankaya",
+      "code": "0.1.2.1",
+      "level": 3,
+      "children": []
+    }, {
+      "id": "969b587c-c50b-4c86-ba8e-0dc052c30c04",
+      "item": "Etimesgut",
+      "code": "0.1.2.1",
+      "level": 3,
+      "children": []
+    }]
+  }, {
+    "id": "dbd741fb-6cca-4c7e-b993-f50ee48ebc8a",
+    "item": "Elazig",
+    "code": "0.1.3",
+    "level": 2,
+    "isExpandable": true,
+    "expanded": false,
+    "children": [{
+      "id": "c61dc9ea-485e-48a1-829d-4f7e65b5a1df",
+      "item": "Palu",
+      "code": "0.1.3.1",
+      "level": 3,
+      "children": []
+    }, {
+      "id": "962ae8c2-27da-451a-9621-5f43a17fd022",
+      "item": "Baskil",
+      "code": "0.1.3.2",
+      "level": 3,
+      "children": []
+    }, {
+      "id": "d1c17a98-1ca9-4860-8c69-dddc7101931d",
+      "item": "Sivrice",
+      "code": "0.1.3.3",
+      "level": 3,
+      "children": []
+    }]
+  }]
 }, {
-  "id": "5f44905d-9501-422c-a293-7d2eaf892797",
+  "id": "da2f4215-e53b-48d3-a278-ac9f1c4fe7c5",
   "item": "İstanbul",
   "code": "0.1.1",
   "level": 2,
   "isExpandable": true,
-  "expanded": false
+  "expanded": false,
+  "children": [{
+    "id": "0f236b2e-be00-47d3-a7e2-eaa0c186c006",
+    "item": "Beykoz",
+    "code": "0.1.1.1",
+    "level": 3,
+    "children": []
+  }, {
+    "id": "67ae9e18-f2f1-422b-8f76-0c5bad381cb7",
+    "item": "Fatih",
+    "code": "0.1.1.1",
+    "level": 3,
+    "children": []
+  }]
 }, {
-  "id": "a57c03b7-6b64-422e-aec5-45c984dd820f",
+  "id": "0f236b2e-be00-47d3-a7e2-eaa0c186c006",
   "item": "Beykoz",
   "code": "0.1.1.1",
-  "level": 3
+  "level": 3,
+  "children": []
 }, {
-  "id": "6b755c3e-fafc-4e14-aef6-448626f81f1b",
+  "id": "67ae9e18-f2f1-422b-8f76-0c5bad381cb7",
   "item": "Fatih",
   "code": "0.1.1.1",
-  "level": 3
+  "level": 3,
+  "children": []
 }, {
-  "id": "da5cba0d-3515-4d7c-a0d9-615ab639eb9c",
+  "id": "a7d85bd7-7ea5-4895-bebf-d9187d1229a9",
   "item": "Ankara",
   "code": "0.1.2",
   "level": 2,
   "isExpandable": true,
-  "expanded": false
+  "expanded": false,
+  "children": [{
+    "id": "bdbcfacb-05bc-4f03-afe9-be13bacf8bfd",
+    "item": "Cankaya",
+    "code": "0.1.2.1",
+    "level": 3,
+    "children": []
+  }, {
+    "id": "969b587c-c50b-4c86-ba8e-0dc052c30c04",
+    "item": "Etimesgut",
+    "code": "0.1.2.1",
+    "level": 3,
+    "children": []
+  }]
 }, {
-  "id": "167fd3e2-a149-4f18-ac91-2ddd452b28bd",
+  "id": "bdbcfacb-05bc-4f03-afe9-be13bacf8bfd",
   "item": "Cankaya",
   "code": "0.1.2.1",
-  "level": 3
+  "level": 3,
+  "children": []
 }, {
-  "id": "e8c3e1e5-26a7-4418-8c4b-92d217a58e20",
+  "id": "969b587c-c50b-4c86-ba8e-0dc052c30c04",
   "item": "Etimesgut",
   "code": "0.1.2.1",
-  "level": 3
+  "level": 3,
+  "children": []
 }, {
-  "id": "34454499-4365-45d6-ae02-92bfa39e8798",
+  "id": "dbd741fb-6cca-4c7e-b993-f50ee48ebc8a",
   "item": "Elazig",
   "code": "0.1.3",
   "level": 2,
   "isExpandable": true,
-  "expanded": false
+  "expanded": false,
+  "children": [{
+    "id": "c61dc9ea-485e-48a1-829d-4f7e65b5a1df",
+    "item": "Palu",
+    "code": "0.1.3.1",
+    "level": 3,
+    "children": []
+  }, {
+    "id": "962ae8c2-27da-451a-9621-5f43a17fd022",
+    "item": "Baskil",
+    "code": "0.1.3.2",
+    "level": 3,
+    "children": []
+  }, {
+    "id": "d1c17a98-1ca9-4860-8c69-dddc7101931d",
+    "item": "Sivrice",
+    "code": "0.1.3.3",
+    "level": 3,
+    "children": []
+  }]
 }, {
-  "id": "dc17af4e-4408-4bec-987f-bdcd2df325f4",
+  "id": "c61dc9ea-485e-48a1-829d-4f7e65b5a1df",
   "item": "Palu",
   "code": "0.1.3.1",
-  "level": 3
+  "level": 3,
+  "children": []
 }, {
-  "id": "88ec4cc8-0e8e-40cf-946e-29a821bc64b2",
+  "id": "962ae8c2-27da-451a-9621-5f43a17fd022",
   "item": "Baskil",
   "code": "0.1.3.2",
-  "level": 3
+  "level": 3,
+  "children": []
 }, {
-  "id": "18cf0972-de09-459c-b69b-3e96a0e0fcfd",
+  "id": "d1c17a98-1ca9-4860-8c69-dddc7101931d",
   "item": "Sivrice",
   "code": "0.1.3.3",
-  "level": 3
+  "level": 3,
+  "children": []
 }]

@@ -53,7 +53,6 @@ export class TreeTableComponent implements OnInit {
   @ViewChild(MatTable) table: MatTable<TreeItemNode[]>;
 
   constructor() { 
-  
   }
 
   
@@ -68,27 +67,28 @@ export class TreeTableComponent implements OnInit {
         return observableOf([]);
       })
     )
-    .subscribe(items => this.sourceRows = items);
+    .subscribe((items) => {
+      this.sourceRows = items
+    });
     
      merge( this.sort.sortChange, this.paginator.page)
     .pipe( 
       switchMap(() => {
         return observableOf(this.sourceRows);
     }),
-      map(rows => {  
-        return this.sourceRowsToTree(rows, '0')  
+      map((rows) => {  
+        console.log('rows', rows);
+        return this.sourceRowsToTree(rows.slice(0), '0')  
       }),
       map((sourceTree) => {  
-        console.log('sorceTree', sourceTree);
-        return this.treeToTable(sourceTree)  
+        // return this.treeToTable(sourceTree)  
       }),
       catchError(() => {
         this.isLoadingResults = false;
         return observableOf([]);
       })
     ).subscribe( rowsToDisplay => { 
-      console.log('rowsToDisplay', rowsToDisplay );
-        this.data = rowsToDisplay;
+        // this.data = rowsToDisplay;
         this.resultsLength = this.data.length;
       });
   }
@@ -103,7 +103,6 @@ export class TreeTableComponent implements OnInit {
         treeNode.item = node.item;
         treeNode.code = node.code;
         treeNode.level = node.code.match(/\./g).length;
-        
 
         if (node.children && node.children.length > 0) {  
           treeNode.isExpandable = true;
