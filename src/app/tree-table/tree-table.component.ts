@@ -69,13 +69,16 @@ export class TreeTableComponent implements OnInit {
     )
     .subscribe((items) => {
       this.sourceRows = items
+      this.retrieveData();
     });
     
-     merge( this.sort.sortChange, this.paginator.page)
+    
+  }
+
+  retrieveData(){
+
+    return observableOf(this.sourceRows)
     .pipe( 
-      switchMap(() => {
-        return observableOf(this.sourceRows);
-    }),
       map((rows) => {  
         // console.log('rows', rows);
         return this.sourceRowsToTree(rows, '0')  
@@ -93,7 +96,9 @@ export class TreeTableComponent implements OnInit {
           // console.log('rowsToDisplay', rowsToDisplay);
         this.resultsLength = this.data.length;
       });
+  
   }
+   
 
 
   inputTreeToSourceRows(tree, rows = []) {
@@ -215,7 +220,8 @@ export class TreeTableComponent implements OnInit {
     const rowToExpand = this.sourceRows.findIndex(x => x.id === row.id);
     let expandedProp = this.sourceRows[rowToExpand].expanded;
     this.sourceRows[rowToExpand].expanded = !expandedProp
-    this.sourceRows = this.sourceRows.slice(0);
+    
+    this.retrieveData();
   }  
 
   isExpand(index, item): boolean{
