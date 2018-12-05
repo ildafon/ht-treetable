@@ -7,8 +7,7 @@ import { MatPaginator, MatSort, MatTable} from '@angular/material';
 import {merge, Observable, of as observableOf} from 'rxjs';
 import {catchError, map, startWith, switchMap} from 'rxjs/operators';
 
-import { LocalService} from '../services/local.service';
-import { RemoteService} from '../services/remote.service';
+import {dataApi} from '../services/local.service';
 
 
 
@@ -35,12 +34,12 @@ export class TreeItemNode {
       transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
     ]),
   ],
-  providers: [ 
-    {provide: LocalService, useClass: LocalService},
-  ]
+ 
 })
 export class TreeTableComponent implements OnInit {
   
+  @Input() dataSource: Observable<dataApi>;
+
   columnsToDisplay: string[] = ['code', 'text'];
   sourceRows: TreeItemNode[];
   
@@ -54,42 +53,46 @@ export class TreeTableComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<TreeItemNode[]>;
 
-  constructor(private dataService: LocalService) { 
-    this.dataService.getData()
-    .pipe(
-      map( result => {
-        this.isLoadingResults = false;
-        return this.inputTreeToSourceRows(result.items);
-      })
-    )
-    .subscribe(items => this.sourceRows = items);
+  constructor() { 
+    
   }
 
   
   ngOnInit() {   
-     
-    merge( this.sort.sortChange, this.paginator.page)
+    
+    this.dataSource
     .pipe(
-     
-      switchMap(() => {  
-        return this.sourceRowsToTree(this.sourceRows, '0')  
-      }),
-      map((sourceTree) => {  
-        console.log('sorceTree', sourceTree);
-        return this.treeToTable(sourceTree)  
+      map(result => {
+        console.log(' result', result);
+        return this.inputTreeToSourceRows(result.items)
       }),
       catchError(() => {
-        this.isLoadingResults = false;
         return observableOf([]);
       })
-    ).subscribe( rowsToDisplay => { 
-      console.log('rowsToDisplay', rowsToDisplay );
-        this.data = rowsToDisplay;
-        this.resultsLength = this.data.length;
-      });
+    )
+    .subscribe(items => this.sourceRows = items)
+    
 
 
-
+    // merge( this.sort.sortChange, this.paginator.page)
+    // .pipe(
+     
+    //   switchMap(() => {  
+    //     return this.sourceRowsToTree(this.sourceRows, '0')  
+    //   }),
+    //   map((sourceTree) => {  
+    //     console.log('sorceTree', sourceTree);
+    //     return this.treeToTable(sourceTree)  
+    //   }),
+    //   catchError(() => {
+    //     this.isLoadingResults = false;
+    //     return observableOf([]);
+    //   })
+    // ).subscribe( rowsToDisplay => { 
+    //   console.log('rowsToDisplay', rowsToDisplay );
+    //     this.data = rowsToDisplay;
+    //     this.resultsLength = this.data.length;
+    //   });
   }
 
 
