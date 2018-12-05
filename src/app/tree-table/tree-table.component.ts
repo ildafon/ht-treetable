@@ -158,16 +158,21 @@ export class TreeTableComponent implements OnInit {
       (<string>o.code).startsWith(level + '.')
       && (o.code.match(/\./g) || []).length === (level.match(/\./g) || []).length + 1
     )
-      .map(node => {
-        
-          const children = obj.filter(so => (<string>so.code).startsWith(level + '.'));
-          if (children && children.length > 0) {
-            
-            node.children = this.sourceRowsToTree(children, node.code);
-          } else {
-            // async extention 
+      .map(o => {
+          const node = new TreeItemNode();
+          node.id = o.id,
+          node.item = o.item,
+          node.code = o.code,
+          node.level = o.level,
+          node.isExpandable = o.isExpandable
+          if (o.expanded) {
+            const children = obj.filter(so => (<string>so.code).startsWith(level + '.'));
+            if (children && children.length > 0) {
+              
+              node.children = this.sourceRowsToTree(children, o.code);
+            }
           }
-        
+           
                
         return node;
       });
