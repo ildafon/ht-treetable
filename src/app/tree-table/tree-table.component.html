@@ -49,8 +49,8 @@
                 </ng-container>
             
               <tr mat-row  mat-row [@rowsAnimation]="" *matRowDef="let row; columns: ['code','expText']; when: isExpand"
-               (click)="row.isExpand ? expandClick(row): getPartial(row.id)"> </tr>    
-
+               (click)="(row.text === 'Istanbul-expandible') ? getPartial(row.text, row) : expandClick(row)"> </tr>    
+              
 
 
 

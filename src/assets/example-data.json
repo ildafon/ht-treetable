@@ -4,7 +4,7 @@
         "item": "Turkiye",
         "code": "0.1",
         "children": [{
-            "item": "Istanbul",
+            "item": "Istanbul-expandible",
             "code": "0.1.1",
             "children": [{
                 "item": "Beykoz",

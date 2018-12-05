@@ -80,7 +80,7 @@ export class TreeTableComponent implements OnInit {
     
   }
 
-  getPartial(id: string){
+  getPartial(id: string, row){
     this.isLoadingResults = true;
     this.dataService.getPartialData(id)
     .pipe(
@@ -92,10 +92,17 @@ export class TreeTableComponent implements OnInit {
       })
     )
     .subscribe(rows => {
+      console.log('partial rows',rows);
       this.isLoadingResults = false;
-      this.sourceRows.push(rows)
-      this.retrieveData;
+      this.sourceRows = [...this.sourceRows, ...rows];
+      console.log('all rows', this.sourceRows);
+
+      const rowToExpand = this.sourceRows.findIndex(x => x.id === row.id);
+      let expandedProp = this.sourceRows[rowToExpand].expanded;
+      this.sourceRows[rowToExpand].expanded = !expandedProp
+      this.retrieveData();
     });
+    
     
   }
 
