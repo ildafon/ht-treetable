@@ -46,7 +46,7 @@ export class TreeTableComponent implements OnInit {
   data: TreeItemNode[];
   
   resultsLength = 0;
-  isLoadingResults = false;
+  isLoadingResults = true;
   filterText: string;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -69,6 +69,7 @@ export class TreeTableComponent implements OnInit {
       })
     )
     .subscribe((items) => {
+      this.isLoadingResults = false;
       this.sourceRows = items
       this.retrieveData();
     });
@@ -77,16 +78,23 @@ export class TreeTableComponent implements OnInit {
   }
 
   retrieveData(source: TreeItemNode[] = this.sourceRows){
-
-    return observableOf(source)
+    this.isLoadingResults = true;
+    merge(observableOf(source), this.paginator.page)
     .pipe( 
+      switchMap(() => {
+        return observableOf(source)
+      }),
       map((rows) => {  
-        console.log('rows', rows);
+        // console.log('rows', rows);
         return this.sourceRowsToTree(rows, '0')  
       }),
       map((sourceTree) => {  
-        console.log('sourceTree', sourceTree);
+        // console.log('sourceTree', sourceTree);
         return this.treeToTable(sourceTree)  
+      }),
+      map((tableRows) => { 
+        this.resultsLength = tableRows.length;
+        return this.getPagedData(tableRows)  
       }),
       catchError(() => {
         this.isLoadingResults = false;
@@ -94,8 +102,8 @@ export class TreeTableComponent implements OnInit {
       })
     ).subscribe( rowsToDisplay => { 
         this.data = rowsToDisplay;
-        console.log('rowsToDisplay', rowsToDisplay);
-        this.resultsLength = this.data.length;
+        this.isLoadingResults = false;
+        
       });
   
   }
@@ -238,8 +246,15 @@ export class TreeTableComponent implements OnInit {
   }
 
   filterChanged(filterText: string) {
+    this.isLoadingResults = true;
     this.filterText = filterText
     this.filteredToTree();
+  }
+
+
+  private getPagedData(data: TreeItemNode[]) {
+    const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
+    return data.splice(startIndex, this.paginator.pageSize);
   }
 }
 
