@@ -150,7 +150,7 @@ export class TreeTableComponent implements OnInit {
     // // Notify the change.
     // this.data = data;
     // this.table.renderRows();
-  }
+    }
 
 
   sourceRowsToTree(obj: TreeItemNode[], level: string): TreeItemNode[] {
