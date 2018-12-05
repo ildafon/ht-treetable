@@ -80,11 +80,11 @@ export class TreeTableComponent implements OnInit {
     return observableOf(source)
     .pipe( 
       map((rows) => {  
-        // console.log('rows', rows);
+        console.log('rows', rows);
         return this.sourceRowsToTree(rows, '0')  
       }),
       map((sourceTree) => {  
-        // console.log('sourceTree', sourceTree);
+        console.log('sourceTree', sourceTree);
         return this.treeToTable(sourceTree)  
       }),
       catchError(() => {
@@ -93,7 +93,7 @@ export class TreeTableComponent implements OnInit {
       })
     ).subscribe( rowsToDisplay => { 
         this.data = rowsToDisplay;
-          // console.log('rowsToDisplay', rowsToDisplay);
+        console.log('rowsToDisplay', rowsToDisplay);
         this.resultsLength = this.data.length;
       });
   
@@ -126,11 +126,17 @@ export class TreeTableComponent implements OnInit {
     );
   };
   
-  filter(filterText: string) {
+  filteredToTree(filterText: string) {
     let filteredTreeData;
     if (filterText) {
       
-      filteredTreeData = this.sourceRows.filter(d => d.item.toLocaleLowerCase().indexOf(filterText.toLocaleLowerCase()) > -1);
+      filteredTreeData = 
+        this.sourceRows.filter(d => d.item.toLocaleLowerCase().indexOf(filterText.toLocaleLowerCase()) > -1)
+        .map(d => {
+          if (d.isExpandable) d.expanded=true
+          return d;
+        });
+        console.log('filteredTreeData', filteredTreeData)
       
       Object.assign([], filteredTreeData).forEach(ftd => {
         let str = (<string>ftd.code);
@@ -139,25 +145,22 @@ export class TreeTableComponent implements OnInit {
           const index = str.lastIndexOf('.');
           str = str.substring(0, index);
           if (filteredTreeData.findIndex(t => t.code === str) === -1) {
-            const obj = this.sourceRows.find(d => d.code === str);
-            if (obj) {
+            const obj = Object.assign({}, this.sourceRows.find(d => d.code === str));
+            if (obj&&obj.id) {
+              obj.expanded = true;
               filteredTreeData.push(obj);
-              console.log('filteredTreeData', filteredTreeData)
+              
             }
           }
         }
       });
     } else {
-      filteredTreeData = this.sourceRows;
+      filteredTreeData = this.sourceRows.map(d => {
+        if (d.isExpandable) d.expanded=false
+        return d;
+      });;
     }
-
-    // Build the tree nodes from Json object. The result is a list of `TodoItemNode` with nested
-    // file node as children.
-    this.retrieveData(filteredTreeData);
-    // // Notify the change.
-    
-
-    
+    this.retrieveData(filteredTreeData);  
   }
 
 
@@ -230,7 +233,7 @@ export class TreeTableComponent implements OnInit {
   }
 
   filterChanged(filterText: string) {
-    this.filter(filterText);
+    this.filteredToTree(filterText);
   }
 }
 
