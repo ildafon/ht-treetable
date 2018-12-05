@@ -38,7 +38,7 @@ export class TreeItemNode {
         style({ height: '*', opacity: '0',  'box-shadow': 'none' }),
         sequence([
           animate(".35s ease", style({ height: '*', opacity: '.2',  'box-shadow': 'none'  })),
-          animate(".35s ease", style({ height: '*', opacity: 1}))
+          animate(".35s ease", style({ height: '*', opacity: 1  }))
         ])
       ])
     ])
@@ -152,7 +152,7 @@ export class TreeTableComponent implements OnInit {
           if (d.isExpandable) d.expanded=true
           return d;
         });
-        console.log('filteredTreeData', filteredTreeData)
+        // console.log('filteredTreeData', filteredTreeData)
       
       Object.assign([], filteredTreeData).forEach(ftd => {
         let str = (<string>ftd.code);
@@ -175,6 +175,7 @@ export class TreeTableComponent implements OnInit {
         if (d.isExpandable) d.expanded=false
         return d;
       });;
+      this.paginator.pageIndex = 0;
     }
     this.retrieveData(filteredTreeData);  
   }
