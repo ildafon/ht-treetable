@@ -30,7 +30,7 @@
 
 
                 <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-                <tr mat-row *matRowDef="let element; columns: columnsToDisplay;"></tr>
+                <tr mat-row [@rowsAnimation]="" *matRowDef="let element; columns: columnsToDisplay;"></tr>
 
 
                 <ng-container matColumnDef="expText">
@@ -48,7 +48,8 @@
                     </td>
                 </ng-container>
             
-              <tr mat-row *matRowDef="let row; columns: ['code','expText']; when: isExpand" (click)="expandClick(row)"> </tr>    
+              <tr mat-row  mat-row [@rowsAnimation]="" *matRowDef="let row; columns: ['code','expText']; when: isExpand" (click)="expandClick(row)"
+              > </tr>    
 
 
 

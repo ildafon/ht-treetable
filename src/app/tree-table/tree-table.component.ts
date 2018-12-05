@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import {animate, state, style, transition, trigger} from '@angular/animations';
+import {animate, state, style, transition, trigger, sequence} from '@angular/animations';
 
 import { MatPaginator, MatSort, MatTable} from '@angular/material';
 import {merge, Observable, of as observableOf} from 'rxjs';
@@ -29,34 +29,37 @@ export class TreeItemNode {
   styleUrls: ['./tree-table.component.scss'],
   animations: [
     trigger('rowExpand', [
-      state('collapsed', style({height: '0px', minHeight: '0', display: 'none'})),
-      state('expanded', style({ height: '*'})),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+      state('collapsed', style({})),
+      state('expanded', style({})),
+      transition('expanded <=> collapsed', animate('525ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
     ]),
+    trigger('rowsAnimation', [
+      transition('void => *', [
+        style({ height: '*', opacity: '0',  'box-shadow': 'none' }),
+        sequence([
+          animate(".35s ease", style({ height: '*', opacity: '.2',  'box-shadow': 'none'  })),
+          animate(".35s ease", style({ height: '*', opacity: 1}))
+        ])
+      ])
+    ])
   ],
  
 })
 export class TreeTableComponent implements OnInit {
   
   @Input() dataSource: Observable<dataApi>;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   columnsToDisplay: string[] = ['code', 'text'];
   sourceRows: TreeItemNode[];
-  
   data: TreeItemNode[];
   
   resultsLength = 0;
   isLoadingResults = true;
   filterText: string;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatTable) table: MatTable<TreeItemNode[]>;
-
-  constructor() { 
-  }
-
   
+    
   ngOnInit() {   
     
     this.dataSource
