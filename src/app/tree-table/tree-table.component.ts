@@ -75,9 +75,9 @@ export class TreeTableComponent implements OnInit {
     
   }
 
-  retrieveData(){
+  retrieveData(source: TreeItemNode[] = this.sourceRows){
 
-    return observableOf(this.sourceRows)
+    return observableOf(source)
     .pipe( 
       map((rows) => {  
         // console.log('rows', rows);
@@ -153,9 +153,10 @@ export class TreeTableComponent implements OnInit {
 
     // Build the tree nodes from Json object. The result is a list of `TodoItemNode` with nested
     // file node as children.
-    const data = this.sourceRowsToTree(filteredTreeData, '0');
+    this.retrieveData(filteredTreeData);
     // // Notify the change.
-    this.data = data;
+    
+
     
   }
 
