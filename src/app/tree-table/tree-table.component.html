@@ -48,8 +48,8 @@
                     </td>
                 </ng-container>
             
-              <tr mat-row  mat-row [@rowsAnimation]="" *matRowDef="let row; columns: ['code','expText']; when: isExpand" (click)="expandClick(row)"
-              > </tr>    
+              <tr mat-row  mat-row [@rowsAnimation]="" *matRowDef="let row; columns: ['code','expText']; when: isExpand"
+               (click)="row.isExpand ? expandClick(row): getPartial(row.id)"> </tr>    
 
 
 

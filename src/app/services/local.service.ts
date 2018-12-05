@@ -16,4 +16,9 @@ export class LocalService {
     const href = '/assets/example-data.json'
     return this.http.get<dataApi>(href);
   }
+
+  getPartialData(id: string): Observable<dataApi> {
+    const href = `/assets/example-data${id}.json`
+    return this.http.get<dataApi>(href);
+  }
 }

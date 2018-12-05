@@ -9,7 +9,7 @@ import {catchError, map, startWith, switchMap, withLatestFrom} from 'rxjs/operat
 
 import {dataApi} from '../services/local.service';
 
-
+import { LocalService } from '../services/local.service';
 
 
 export class TreeItemNode {
@@ -58,7 +58,7 @@ export class TreeTableComponent implements OnInit {
   isLoadingResults = true;
   filterText: string;
 
-  
+  constructor(private dataService: LocalService){}
     
   ngOnInit() {   
     
@@ -79,6 +79,26 @@ export class TreeTableComponent implements OnInit {
     
     
   }
+
+  getPartial(id: string){
+    this.isLoadingResults = true;
+    this.dataService.getPartialData(id)
+    .pipe(
+      map(result => {
+        return this.inputTreeToSourceRows(result.items)
+      }),
+      catchError(() => {
+        return observableOf([]);
+      })
+    )
+    .subscribe(rows => {
+      this.isLoadingResults = false;
+      this.sourceRows.push(rows)
+      this.retrieveData;
+    });
+    
+  }
+
 
   retrieveData(source: TreeItemNode[] = this.sourceRows){
     this.isLoadingResults = true;
