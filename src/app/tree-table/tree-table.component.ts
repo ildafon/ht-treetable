@@ -78,17 +78,19 @@ export class TreeTableComponent implements OnInit {
     }),
       map((rows) => {  
         console.log('rows', rows);
-        return this.sourceRowsToTree(rows.slice(0), '0')  
+        return this.sourceRowsToTree(rows, '0')  
       }),
       map((sourceTree) => {  
-        // return this.treeToTable(sourceTree)  
+        console.log('sourceTree', sourceTree);
+        return this.treeToTable(sourceTree)  
       }),
       catchError(() => {
         this.isLoadingResults = false;
         return observableOf([]);
       })
     ).subscribe( rowsToDisplay => { 
-        // this.data = rowsToDisplay;
+        this.data = rowsToDisplay;
+          console.log('rowsToDisplay', rowsToDisplay);
         this.resultsLength = this.data.length;
       });
   }
@@ -149,7 +151,7 @@ export class TreeTableComponent implements OnInit {
     const data = this.sourceRowsToTree(filteredTreeData, '0');
     // // Notify the change.
     this.data = data;
-    this.table.renderRows();
+    
   }
 
 
@@ -164,8 +166,10 @@ export class TreeTableComponent implements OnInit {
           node.item = o.item,
           node.code = o.code,
           node.level = o.level,
-          node.isExpandable = o.isExpandable
+          node.isExpandable = o.isExpandable,
+          node.expanded = o.expanded
           if (o.expanded) {
+            
             const children = obj.filter(so => (<string>so.code).startsWith(level + '.'));
             if (children && children.length > 0) {
               
@@ -182,7 +186,7 @@ export class TreeTableComponent implements OnInit {
     if (!tree.length) return tree;
     return tree.reduce(
       (acc, node) => {
-        if (node.children && node.children.length > 0) {
+        if (node.isExpandable) {
           acc.push({
             id: node.id, 
             text: node.item, 
@@ -190,7 +194,10 @@ export class TreeTableComponent implements OnInit {
             isExpandable: node.isExpandable, 
             expanded: node.expanded, 
             level: node.level});
-            this.treeToTable(node.children, rows);
+            if (node.expanded){
+              this.treeToTable(node.children, rows);
+            }
+            
         } else {
           acc.push({
             id: node.id, 
