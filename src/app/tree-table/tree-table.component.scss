@@ -25,3 +25,28 @@
 table {
     width: 100%;
 }
+
+.code-column {
+    width: 30%;
+}
+
+.text-column {
+    padding-left: 24px;
+}
+
+.extend-column, .extend-cell {
+    position: relative;
+    width: 0;
+}
+
+.extend-cell {
+    position: absolute;
+}
+
+tr.row-cells:hover {
+    background: #f5f5f5;
+  }
+  
+  tr.row-cells:active {
+    background: #efefef;
+  }

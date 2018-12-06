@@ -52,7 +52,10 @@ export class TreeTableComponent implements OnInit {
   @Input() dataSource: Observable<dataApi>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  columnsToDisplay: string[] = ['code', 'text'];
+  
+  columnsToDisplay: string[] = ['code', 'extend', 'text'];
+  itemsToSearchWithin = ['code','item'];
+
   data: TreeItemNode[];
   
   resultsLength = 0;
@@ -151,7 +154,7 @@ export class TreeTableComponent implements OnInit {
         
         return acc;
       },
-      rows,
+      rows
     );
   };
   
@@ -217,13 +220,17 @@ export class TreeTableComponent implements OnInit {
     return data.splice(startIndex, this.paginator.pageSize);
   }
 
+
+
+
   private getFilteredData(data: TreeItemNode[]) {
     if (!this.filterText) {
       return data
     } 
 
-    let filteredData = data.filter(d => {        
-        if (d.item.toLocaleLowerCase().indexOf(this.filterText.toLocaleLowerCase()) > -1){
+    let filteredData = data.filter(d => {      
+        const cols = this.itemsToSearchWithin.reduce((acc,col)=> acc + d[col],''); 
+        if (cols.toLocaleLowerCase().indexOf(this.filterText.toLocaleLowerCase()) > -1){
           return d;
         }
       })
