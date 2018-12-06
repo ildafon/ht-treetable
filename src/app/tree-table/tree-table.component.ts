@@ -4,8 +4,14 @@ import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import {animate, state, style, transition, trigger, sequence} from '@angular/animations';
 
 import { MatPaginator, MatSort, MatTable} from '@angular/material';
-import {merge, Observable, of as observableOf} from 'rxjs';
-import {catchError, map, startWith, switchMap, withLatestFrom} from 'rxjs/operators';
+import {merge, Observable, of as observableOf, BehaviorSubject} from 'rxjs';
+import {
+  catchError, 
+  map, 
+  startWith, 
+  switchMap, 
+  withLatestFrom
+   } from 'rxjs/operators';
 
 import {dataApi} from '../services/local.service';
 
@@ -28,11 +34,7 @@ export class TreeItemNode {
   templateUrl: './tree-table.component.html',
   styleUrls: ['./tree-table.component.scss'],
   animations: [
-    trigger('rowExpand', [
-      state('collapsed', style({})),
-      state('expanded', style({})),
-      transition('expanded <=> collapsed', animate('525ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
+    
     trigger('rowsAnimation', [
       transition('void => *', [
         style({ height: '*', opacity: '0',  'box-shadow': 'none' }),
@@ -51,12 +53,19 @@ export class TreeTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   columnsToDisplay: string[] = ['code', 'text'];
-  sourceRows: TreeItemNode[];
   data: TreeItemNode[];
   
   resultsLength = 0;
   isLoadingResults = true;
-  filterText: string;
+
+  
+  sourceRowsSubject = new BehaviorSubject<TreeItemNode[]>([]);
+  get sourceRows(): TreeItemNode[]  { return this.sourceRowsSubject.value; }
+  sourceRowsObservable = this.sourceRowsSubject.asObservable();
+
+  filterTextSubject = new BehaviorSubject<string>("");
+  get filterText(): string  { return this.filterTextSubject.value; }
+  fiterTextObservable = this.filterTextSubject.asObservable();
 
   constructor(private dataService: LocalService){}
     
@@ -73,46 +82,26 @@ export class TreeTableComponent implements OnInit {
     )
     .subscribe((items) => {
       this.isLoadingResults = false;
-      this.sourceRows = items
-      this.retrieveData();
-    });
-    
-    
+      this.sourceRowsSubject.next(items);
+      
+      this.initialize();
+    });    
   }
 
-  getPartial(id: string, row){
-    this.isLoadingResults = true;
-    this.dataService.getPartialData(id)
-    .pipe(
-      map(result => {
-        return this.inputTreeToSourceRows(result.items)
-      }),
-      catchError(() => {
-        return observableOf([]);
-      })
-    )
-    .subscribe(rows => {
-      console.log('partial rows',rows);
-      this.isLoadingResults = false;
-      this.sourceRows = [...this.sourceRows, ...rows];
-      console.log('all rows', this.sourceRows);
-
-      const rowToExpand = this.sourceRows.findIndex(x => x.id === row.id);
-      let expandedProp = this.sourceRows[rowToExpand].expanded;
-      this.sourceRows[rowToExpand].expanded = !expandedProp
-      this.retrieveData();
-    });
+  initialize(){
     
-    
-  }
-
-
-  retrieveData(source: TreeItemNode[] = this.sourceRows){
     this.isLoadingResults = true;
-    merge(observableOf(source), this.paginator.page)
+
+    merge(
+      this.sourceRowsObservable,
+      this.fiterTextObservable,
+      this.paginator.page)
     .pipe( 
       switchMap(() => {
-        return observableOf(source)
+        return this.sourceRowsObservable
+      }),
+      map((rows)=>{
+        return this.getFilteredData(rows);
       }),
       map((rows) => {  
         // console.log('rows', rows);
@@ -135,12 +124,13 @@ export class TreeTableComponent implements OnInit {
         this.isLoadingResults = false;
         
       });
+  };
+
   
-  }
    
 
 
-  inputTreeToSourceRows(tree, rows = []) {
+  private inputTreeToSourceRows(tree, rows = []) {
     if (!tree.length) return tree;
     return tree.reduce(
       (acc, node) => {
@@ -165,50 +155,7 @@ export class TreeTableComponent implements OnInit {
     );
   };
   
-  filteredToTree(filterText: string = this.filterText) {
-    let filteredTreeData;
-    if (filterText) {
-      
-      filteredTreeData = 
-        this.sourceRows.filter(d => {
-          if (d.item.toLocaleLowerCase().indexOf(filterText.toLocaleLowerCase()) > -1){
-            return d;
-          }
-        })
-        .map(d => {
-          if (d.isExpandable) d.expanded=true
-          return d;
-        });
-        // console.log('filteredTreeData', filteredTreeData)
-      
-      Object.assign([], filteredTreeData).forEach(ftd => {
-        let str = (<string>ftd.code);
-        
-        while (str.lastIndexOf('.') > -1) {
-          const index = str.lastIndexOf('.');
-          str = str.substring(0, index);
-          if (filteredTreeData.findIndex(t => t.code === str) === -1) {
-            const obj = Object.assign({}, this.sourceRows.find(d => d.code === str));
-            if (obj&&obj.id) {
-              obj.expanded = true;
-              filteredTreeData.push(obj);
-              
-            }
-          }
-        }
-      });
-    } else {
-      filteredTreeData = this.sourceRows.map(d => {
-        if (d.isExpandable) d.expanded=false
-        return d;
-      });;
-      this.paginator.pageIndex = 0;
-    }
-    this.retrieveData(filteredTreeData);  
-  }
-
-
-  sourceRowsToTree(obj: TreeItemNode[], level: string): TreeItemNode[] {
+  private sourceRowsToTree(obj: TreeItemNode[], level: string): TreeItemNode[] {
     return obj.filter(o =>
       (<string>o.code).startsWith(level + '.')
       && (o.code.match(/\./g) || []).length === (level.match(/\./g) || []).length + 1
@@ -235,7 +182,7 @@ export class TreeTableComponent implements OnInit {
       });
   }
 
-  treeToTable(tree, rows = []) {
+  private treeToTable(tree, rows = []) {
     if (!tree.length) return tree;
     return tree.reduce(
       (acc, node) => {
@@ -264,13 +211,87 @@ export class TreeTableComponent implements OnInit {
     );
   };
 
-  expandClick(row) {
-    const rowToExpand = this.sourceRows.findIndex(x => x.id === row.id);
-    let expandedProp = this.sourceRows[rowToExpand].expanded;
-    this.sourceRows[rowToExpand].expanded = !expandedProp
+
+  private getPagedData(data: TreeItemNode[]) {
+    const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
+    return data.splice(startIndex, this.paginator.pageSize);
+  }
+
+  private getFilteredData(data: TreeItemNode[]) {
+    if (!this.filterText) {
+      return data
+    } 
+
+    let filteredData = data.filter(d => {        
+        if (d.item.toLocaleLowerCase().indexOf(this.filterText.toLocaleLowerCase()) > -1){
+          return d;
+        }
+      })
+      .map(d => {
+        if (d.isExpandable) d.expanded=true
+        return d;
+      });
+      
     
-    this.retrieveData();
-  }  
+    Object.assign([], filteredData).forEach(ftd => {
+      let str = (<string>ftd.code);
+      
+      while (str.lastIndexOf('.') > -1) {
+        const index = str.lastIndexOf('.');
+        str = str.substring(0, index);
+        if (filteredData.findIndex(t => t.code === str) === -1) {
+          const obj = Object.assign({}, data.find(d => d.code === str));
+          if (obj&&obj.id) {
+            obj.expanded = true;
+            filteredData.push(obj);
+            
+          }
+        }
+      }
+    });
+     
+    return filteredData;  
+  }
+
+
+
+
+
+  expandClick(row) {
+    const toChenge = this.sourceRows;
+    const indexToExpand = toChenge.findIndex(x => x.id === row.id);
+    let expandedProp = toChenge[indexToExpand].expanded;
+    toChenge[indexToExpand].expanded = !expandedProp
+    this.sourceRowsSubject.next(toChenge);
+    
+  }
+  
+  getPartial(id: string, row){
+    this.isLoadingResults = true;
+    this.dataService.getPartialData(id)
+    .pipe(
+      map(result => {
+        return this.inputTreeToSourceRows(result.items)
+      }),
+      catchError(() => {
+        return observableOf([]);
+      })
+    )
+    .subscribe(rows => {
+      
+      this.isLoadingResults = false;
+            
+      const toChange = this.sourceRows;
+      const indexToExpand = toChange.findIndex(x => x.id === row.id);
+      let expandedProp = toChange[indexToExpand].expanded;
+      toChange[indexToExpand].expanded = !expandedProp
+
+      this.sourceRowsSubject.next([...toChange, ...rows]);
+    });
+    
+    
+  }
+
 
   isExpand(index, item): boolean{
     return item.isExpandable;
@@ -278,16 +299,7 @@ export class TreeTableComponent implements OnInit {
 
   filterChanged(filterText: string) {
     this.isLoadingResults = true;
-    this.filterText = filterText
-    this.filteredToTree();
+    this.filterTextSubject.next(filterText); 
   }
 
-
-  private getPagedData(data: TreeItemNode[]) {
-    const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
-    return data.splice(startIndex, this.paginator.pageSize);
-  }
 }
-
-
-
