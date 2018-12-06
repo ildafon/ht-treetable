@@ -225,6 +225,7 @@ export class TreeTableComponent implements OnInit {
 
   private getFilteredData(data: TreeItemNode[]) {
     if (!this.filterText) {
+      // this.collapseAll();
       return data
     } 
 
@@ -265,12 +266,23 @@ export class TreeTableComponent implements OnInit {
 
 
   expandClick(row) {
-    const toChenge = this.sourceRows;
-    const indexToExpand = toChenge.findIndex(x => x.id === row.id);
-    let expandedProp = toChenge[indexToExpand].expanded;
-    toChenge[indexToExpand].expanded = !expandedProp
-    this.sourceRowsSubject.next(toChenge);
+    const toChange = this.sourceRows;
+    const indexToExpand = toChange.findIndex(x => x.id === row.id);
+    let expandedProp = toChange[indexToExpand].expanded;
+    toChange[indexToExpand].expanded = !expandedProp
+    this.sourceRowsSubject.next(toChange);
     
+  }
+
+  expandAll(){
+    const toChange = this.sourceRows;
+    toChange.forEach( r => r.expanded = true);
+    this.sourceRowsSubject.next(toChange);
+  }
+  collapseAll(){
+    const toChange = this.sourceRows;
+    toChange.forEach( r => r.expanded = false);
+    this.sourceRowsSubject.next(toChange);
   }
   
   getPartial(id: string, row){
@@ -304,9 +316,17 @@ export class TreeTableComponent implements OnInit {
     return item.isExpandable;
   }
 
-  filterChanged(filterText: string) {
-    this.isLoadingResults = true;
-    this.filterTextSubject.next(filterText); 
+  filterChanged($event) {
+    
+    if ($event.keyCode == 27 ) {
+      this.collapseAll();
+      this.paginator.pageIndex = 0;
+    }
+    
+      this.filterTextSubject.next($event.target.value); 
+    
+      
+    
   }
 
 }
