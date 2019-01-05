@@ -4,6 +4,7 @@ import { map } from 'rxjs/operators';
 import { dataApi } from './services/local.service';
 import { LocalService } from './services/local.service';
 import { RemoteService } from './services/remote.service';
+import { fmsItem } from './models/fms.model';
 
 
 @Component({
@@ -14,11 +15,12 @@ import { RemoteService } from './services/remote.service';
     {provide: LocalService, useClass: LocalService},
   ]
 })
-export class AppComponent{
-  gettedTree: Observable<dataApi>;
+export class AppComponent implements OnInit{
+  data: Observable<fmsItem[]>;
+  
+  constructor(private dataService: LocalService) {}
 
-  constructor(private dataService: LocalService) { 
-    
-    this.gettedTree = this.dataService.getData()
+  ngOnInit() {
+    this.data = this.dataService.getFMSData()
   }
 }

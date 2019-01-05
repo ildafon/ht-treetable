@@ -4,13 +4,15 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
-import { TreeTableModule } from './tree-table/tree-table.module';
-
+// import { TreeTableModule } from './tree-table/tree-table.module';
+import { HierTableModule } from './hier-table/hier-table.module';
 import { AppComponent } from './app.component';
+
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    
   ],
   imports: [
     BrowserModule,
@@ -18,7 +20,9 @@ import { AppComponent } from './app.component';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    TreeTableModule
+    HierTableModule
+    // TreeTableModule,
+   
   ],
   
   providers: [],
