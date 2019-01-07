@@ -1,10 +1,10 @@
 import { v4 as uuid } from 'uuid';
 
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, OnDestroy } from '@angular/core';
 import {animate, state, style, transition, trigger, sequence} from '@angular/animations';
 
 import { MatPaginator, MatSort, MatTable} from '@angular/material';
-import {merge, Observable, of as observableOf, BehaviorSubject} from 'rxjs';
+import {merge, Observable, of as observableOf, BehaviorSubject, Subscription} from 'rxjs';
 import {
   catchError, 
   map, 
@@ -49,7 +49,7 @@ export interface htHashTableI {
   ],
  
 })
-export class HierTableComponent implements OnInit {
+export class HierTableComponent implements OnInit, OnDestroy {
   
   @Input() source: Observable<fmsItem[]>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -58,22 +58,39 @@ export class HierTableComponent implements OnInit {
   hashTable: htHashTableI;
   hashOutput: string[];
 
-
+  subscription: Subscription;
 
 
   ngOnInit() {   
-        this.source.pipe(
-            map((rows: fmsItem[])=> 
-              this.ToHash(rows)
-            )
-            
-          )
-          .subscribe((result) => {
-            // this.hashTable = result
-            console.log(result )
-          });
+      this.subscription = this.source
+      .pipe(
+          map((rows: fmsItem[]) => 
+            this.toHash(rows)
+          )      
+      )
+      .subscribe((result) => {
+        this.hashTable = result; 
+        console.log(this.hashTable)
+      });
+  }
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
+  private toHash(rows: fmsItem[]): htHashTableI {
+    const sortedRows = this.getSortedRows(rows);
+
+    return sortedRows.reduce( (obj, cur, idx, src) => {
+      const hashItem = new htHashItemC();
+      hashItem.id = cur.id;
+      hashItem.row = cur;
+      hashItem.parentId = this.getParentId(cur, src);
+      hashItem.childrenIds = this.getChildrenIds(cur, src);
+
+      obj[hashItem.id] = hashItem;
+      return obj;
+    }, {});
+  }
   
 
   private getSortedRows(data: fmsItem[]){
@@ -95,8 +112,7 @@ export class HierTableComponent implements OnInit {
         const parentRow = array[parentIndex];
        return  parentRow.id;
       }
-    } else 
-      return null; // No dots in code, then this row hasn`t parent
+    } else  return null; // No dots in code, then this row hasn`t parent
   }
 
   private getChildrenIds(row: fmsItem, array: fmsItem[]): string[] | null {
@@ -106,20 +122,6 @@ export class HierTableComponent implements OnInit {
     .map( elem => elem.id)
   }
 
-  ToHash(rows: fmsItem[]) {
-    const sortedRows = this.getSortedRows(rows);
-
-    return sortedRows.reduce( (acc, cur, idx, src) => {
-      const hashItem = new htHashItemC();
-      hashItem.id = cur.id;
-      hashItem.row = cur;
-      hashItem.parentId = this.getParentId(cur, src);
-      hashItem.childrenIds = this.getChildrenIds(cur, src);
-
-      acc.push(hashItem);
-      return acc;
-    }, []);
-  }
   
 }
 
