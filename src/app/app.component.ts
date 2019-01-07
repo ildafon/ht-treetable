@@ -4,7 +4,9 @@ import { map } from 'rxjs/operators';
 import { dataApi } from './services/local.service';
 import { LocalService } from './services/local.service';
 import { RemoteService } from './services/remote.service';
-import { htFmsItemI } from './models/fms.model';
+import { htFmsItemI,  column } from './models';
+
+import { environment } from '../environments/environment';
 
 
 @Component({
@@ -17,6 +19,7 @@ import { htFmsItemI } from './models/fms.model';
 })
 export class AppComponent implements OnInit{
   data: Observable<htFmsItemI[]>;
+  columns: column[] = environment.columns;
   
   constructor(private dataService: LocalService) {}
 

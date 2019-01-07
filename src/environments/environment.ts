@@ -3,7 +3,12 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  columns: [
+    { name: 'code', displayName: 'Код', expandButton: false, class: 'code-class'},
+    { name: 'text', displayName: 'Функция', expandButton: true, class: 'text-class'},
+    { name: 'criterion', displayName: 'Состояние', expandButton: false, class: 'criterion-class'},
+  ]
 };
 
 /*

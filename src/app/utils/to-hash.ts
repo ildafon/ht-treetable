@@ -31,13 +31,12 @@ function getParentId(row: htFmsItemI, array: htFmsItemI[]): string|null {
         const parentRow = array[parentIndex];
        return  parentRow.id;
       }
-    } else  return null; // No dots in code, then this row hasn`t parent
+    } else return null; // No dots in code, then this row hasn`t parent
 }
 
 function getChildrenIds(row: htFmsItemI, array: htFmsItemI[]): string[] | null {
-    const chilrenCodePattern = `//`
     return array.filter( elem => elem.code.startsWith(row.code) 
-    && (elem.code.match(/\./g) || []).length === (row.code.match(/\./g) || []).length + 1 )
+        && (elem.code.match(/\./g) || []).length === (row.code.match(/\./g) || []).length + 1 )
     .map( elem => elem.id)
 }
 

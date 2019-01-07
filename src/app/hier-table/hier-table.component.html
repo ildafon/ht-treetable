@@ -6,47 +6,73 @@
   <div class="loading-shade"
       *ngIf="isLoadingResults">
       <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
- </div>
+  </div>
+
   <div class="table-container">
 
       
-      <table mat-table
-              [dataSource]="data" >
+        <table mat-table
+                [dataSource]="data" >
 
-              <ng-container matColumnDef="code">
-                  <th class="code-column" mat-header-cell *matHeaderCellDef > Code </th>
-                  <td mat-cell *matCellDef="let element"></td>
-              </ng-container>
+                <ng-container matColumnDef="{{column.name}}" *ngFor="let column of columns">
+                    <th [className]="column.class" mat-header-cell *matHeaderCellDef> {{column.displayName}} </th>
+                    <td [className]="column.class" mat-cell *matCellDef="let element">
+                            
+                        <button *ngIf="column.expandButton" mat-icon-button>        
+                            <mat-icon class="mat-icon-rtl-mirror">
+                                {{element.open ? 'expand_more': 'chevron_right'  }}
+                            </mat-icon>
+                        </button>
 
-              <ng-container matColumnDef="text">
-                  <th class="text-column" mat-header-cell *matHeaderCellDef > Text </th>
-                  <td [style.padding-left.px]="24 * element.level" mat-cell *matCellDef="let element"></td>
-              </ng-container>
+                        
+                         {{element[column.name]}} 
+                    </td>
+                </ng-container>
 
-              <ng-container matColumnDef="extend">
-                  <th class="extend-column" mat-header-cell *matHeaderCellDef></th>
-                  <td  class="extend-cell"  mat-cell *matCellDef="let element">
-                      <button *ngIf="element.isExpandable" class="extend-button" [style.left.px]="24 * element.level - 36" mat-icon-button>                                
-                          <mat-icon class="mat-icon-rtl-mirror">
-                              {{element.expanded ? 'expand_more': 'chevron_right'  }}
-                          </mat-icon>                         
-                      </button>
-                  </td>
-              </ng-container>
 
-              <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-              <tr class="row-cells" mat-row [@rowsAnimation]="" *matRowDef="let element; columns: columnsToDisplay;"
-              (click)="expandClick(element)"></tr>
+                <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+                <tr mat-row *matRowDef="let element; columns: columnsToDisplay;"></tr>
 
 
 
-      </table>
+                <!-- <ng-container matColumnDef="code">
+                    <th mat-header-cell *matHeaderCellDef > Code </th>
+                    <td mat-cell *matCellDef="let element"> {{element.code}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="text">
+                    <th class="text-column" mat-header-cell *matHeaderCellDef > Text </th>
+                    <td  mat-cell *matCellDef="let element">{{element.text}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="criterion">
+                    <th class="text-column" mat-header-cell *matHeaderCellDef > Criterion </th>
+                    <td  mat-cell *matCellDef="let element">{{ element.criterion}}</td>
+                </ng-container> -->
+
+                <!-- <ng-container matColumnDef="expandable">
+                    <th class="expandable-column" mat-header-cell *matHeaderCellDef></th>
+                    <td  class="expandable-cell"  mat-cell *matCellDef="let element">
+                        <button *ngIf="element.isExpandable" class="extend-button" mat-icon-button>                                
+                            <mat-icon class="mat-icon-rtl-mirror">
+                                {{element.expanded ? 'expand_more': 'chevron_right'  }}
+                            </mat-icon>                         
+                        </button>
+                    </td>
+                </ng-container> -->
+<!-- 
+                <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+                <tr class="row-cells" mat-row [@rowsAnimation]="" *matRowDef="let element; columns: columnsToDisplay;"></tr> -->
+
+
+
+        </table>
   </div>
-  <mat-paginator #paginator
+        <mat-paginator #paginator
           [length]="resultsLength"
           [pageIndex]="0"
           [pageSize]="5"
           [pageSizeOptions]="[5, 25, 50, 100, 250]">
-      </mat-paginator>
+        </mat-paginator>
 </div>  
 

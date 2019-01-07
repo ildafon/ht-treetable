@@ -16,7 +16,7 @@ import {
 import {dataApi} from '../services/local.service';
 
 import { LocalService } from '../services/local.service';
-import { htFmsItemI, htHashItemC, htHashTableI } from '../models';
+import { htFmsItemI, htHashItemC, htHashTableI, column } from '../models';
 import { toHash } from '../utils';
 
 
@@ -44,14 +44,18 @@ import { toHash } from '../utils';
 export class HierTableComponent implements OnInit, OnDestroy {
   
   @Input() source: Observable<htFmsItemI[]>;
+  @Input() columns: column[];
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  
-  output: htFmsItemI[];
-  hashTable: htHashTableI;
-  hashOutput: string[];
-
   subscription: Subscription;
+  data: htFmsItemI[];
 
+  entities: htHashTableI;
+  ids: string[];
+  output: string[] = [];
+  
+
+  columnsToDisplay: string[];
+  
 
   ngOnInit() {   
       this.subscription = this.source
@@ -60,16 +64,34 @@ export class HierTableComponent implements OnInit, OnDestroy {
             toHash(rows)
           )      
       )
-      .subscribe((result) => {
-        this.hashTable = result;
-        console.log(result); 
+      .subscribe((result: htHashTableI) => {
+        this.entities = result;
+        this.ids = Object.keys(this.entities);
+        this.selectRootRowIds().forEach(id => this.getDescendantIds(this.output, id));
+        this.data = this.output.map( id => this.entities[id].row);
+        console.log(this.output);
       });
+
+
+      this.columnsToDisplay = this.columns.map(column => column.name);
   }
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 
-  
+  selectRootRowIds(): string[] {
+    return this.ids.filter( id => this.entities[id].parentId === null );
+  }
+
+  getRows() {
+    return this.ids.map(id => this.entities[id].row);
+  }
+
+  getDescendantIds(descendantIds: string[], rowId: string): void {
+    descendantIds.push(rowId);
+    const childrenIds = this.entities[rowId].childrenIds;
+    childrenIds.forEach( (childId: string) => this.getDescendantIds(descendantIds, childId));
+  }
   
 }
 
