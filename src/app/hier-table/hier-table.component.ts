@@ -16,19 +16,11 @@ import {
 import {dataApi} from '../services/local.service';
 
 import { LocalService } from '../services/local.service';
-import { fmsItem } from '../models/fms.model';
+import { htFmsItemI, htHashItemC, htHashTableI } from '../models';
+import { ToHash } from '../utils';
 
 
-export class htHashItemC {
-      id: string;
-      row: fmsItem;
-      parentId: string | null;
-      childrenIds: string[] = []; 
-}
 
-export interface htHashTableI {
-  [id:string]: htHashItemC
-}
 
 
 @Component({
@@ -51,10 +43,10 @@ export interface htHashTableI {
 })
 export class HierTableComponent implements OnInit, OnDestroy {
   
-  @Input() source: Observable<fmsItem[]>;
+  @Input() source: Observable<htFmsItemI[]>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   
-  output: fmsItem[];
+  output: htFmsItemI[];
   hashTable: htHashTableI;
   hashOutput: string[];
 
@@ -64,61 +56,20 @@ export class HierTableComponent implements OnInit, OnDestroy {
   ngOnInit() {   
       this.subscription = this.source
       .pipe(
-          map((rows: fmsItem[]) => 
-            this.toHash(rows)
+          map((rows: htFmsItemI[]) => 
+            ToHash(rows)
           )      
       )
       .subscribe((result) => {
-        this.hashTable = result; 
-        console.log(this.hashTable)
+        this.hashTable = result;
+        console.log(result); 
       });
   }
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 
-  private toHash(rows: fmsItem[]): htHashTableI {
-    return rows.reduce( (obj, cur, idx, src) => {
-      const hashItem = new htHashItemC();
-      hashItem.id = cur.id;
-      hashItem.row = cur;
-      hashItem.parentId = this.getParentId(cur, src);
-      hashItem.childrenIds = this.getChildrenIds(cur, src);
-
-      obj[hashItem.id] = hashItem;
-      return obj;
-    }, {});
-  }
   
-
-  private getSortedRows(data: fmsItem[]){
-    return [...data].sort((a,b) => (a.code > b.code) ? 1 : ((b.code > a.code) ? -1 : 0)); 
-  }
-
-  private getLevel( row: fmsItem) {
-    if (!row.code || row.code.length === 0) return new Error('Incorrent row syntax');
-    return ((<string>row.code).match(/\./g) || []).length + 1
-  }
-  
-  private getParentId(row: fmsItem, array: fmsItem[]): string|null {
-    const index = row.code.lastIndexOf('.');
-    if (index > -1) {
-      const parentCode = row.code.substring(0, index);
-      const parentIndex = array.findIndex(t => t.code === parentCode);
-      if (parentIndex > -1) {
-        const parentRow = array[parentIndex];
-       return  parentRow.id;
-      }
-    } else  return null; // No dots in code, then this row hasn`t parent
-  }
-
-  private getChildrenIds(row: fmsItem, array: fmsItem[]): string[] | null {
-    const chilrenCodePattern = `//`
-    return array.filter( elem => elem.code.startsWith(row.code) 
-    && (elem.code.match(/\./g) || []).length === (row.code.match(/\./g) || []).length + 1 )
-    .map( elem => elem.id)
-  }
-
   
 }
 

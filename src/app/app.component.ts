@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 import { dataApi } from './services/local.service';
 import { LocalService } from './services/local.service';
 import { RemoteService } from './services/remote.service';
-import { fmsItem } from './models/fms.model';
+import { htFmsItemI } from './models/fms.model';
 
 
 @Component({
@@ -16,7 +16,7 @@ import { fmsItem } from './models/fms.model';
   ]
 })
 export class AppComponent implements OnInit{
-  data: Observable<fmsItem[]>;
+  data: Observable<htFmsItemI[]>;
   
   constructor(private dataService: LocalService) {}
 
