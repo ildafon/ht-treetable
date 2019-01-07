@@ -22,8 +22,8 @@ import { fmsItem } from '../models/fms.model';
 export class htHashItemC {
       id: string;
       row: fmsItem;
-      parentId: string;
-      childrenIds: string[]; 
+      parentId: string | null;
+      childrenIds: string[] = []; 
 }
 
 export interface htHashTableI {
@@ -69,19 +69,59 @@ export class HierTableComponent implements OnInit {
             
           )
           .subscribe((result) => {
-            this.hashTable = result
-            console.log(this.hashTable )
+            // this.hashTable = result
+            console.log(result )
           });
   }
 
+  
+
   private getSortedRows(data: fmsItem[]){
-    return data.sort((a,b)=> a.code.localeCompare(b.code));
+    return [...data].sort((a,b) => (a.code > b.code) ? 1 : ((b.code > a.code) ? -1 : 0)); 
+
   }
 
-  ToHash(rows: fmsItem[]): htHashTableI {
-    const hashTable = {};
+  private getLevel( row: fmsItem) {
+    if (!row.code || row.code.length === 0) return new Error('Incorrent row syntax');
+    return ((<string>row.code).match(/\./g) || []).length + 1
+  }
+  
+  private getParentId(row: fmsItem, array: fmsItem[]): string|null {
+    const index = row.code.lastIndexOf('.');
+    if (index > -1) {
+      const parentCode = row.code.substring(0, index);
+      const parentIndex = array.findIndex(t => t.code === parentCode);
+      if (parentIndex > -1) {
+        const parentRow = array[parentIndex];
+       return  parentRow.id;
+      }
+    } else 
+      return null; // No dots in code, then this row hasn`t parent
+  }
 
-    return hashTable;
+  private getChildrenIds(row: fmsItem, array: fmsItem[]): string[] | null {
+    const chilrenCodePattern = `//`
+    return array.filter( elem => elem.code.startsWith(row.code) 
+    && (elem.code.match(/\./g) || []).length === (row.code.match(/\./g) || []).length + 1 )
+    .map( elem => elem.id)
+  }
+
+  ToHash(rows: fmsItem[]) {
+    const sortedRows = this.getSortedRows(rows);
+
+    return sortedRows.reduce( (acc, cur, idx, src) => {
+      const hashItem = new htHashItemC();
+      hashItem.id = cur.id;
+      hashItem.row = cur;
+      hashItem.parentId = this.getParentId(cur, src);
+      hashItem.childrenIds = this.getChildrenIds(cur, src);
+
+      acc.push(hashItem);
+      return acc;
+    }, []);
   }
   
 }
+
+
+
