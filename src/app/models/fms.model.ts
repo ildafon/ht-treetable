@@ -6,6 +6,7 @@ export interface htFmsItemI {
     hidden: boolean;
     open: boolean;
     flag: boolean;
+    level?: number;
   }
 
   export interface fmsItem {

@@ -5,8 +5,17 @@ export  function toHash (rows: htFmsItemI[]): htHashTableI {
       const hashItem = new htHashItemC();
       hashItem.id = cur.id;
       hashItem.row = cur;
+      hashItem.row.level = getLevel(cur);
       hashItem.parentId = getParentId(cur, src);
       hashItem.childrenIds = getChildrenIds(cur, src);
+
+      // If rows has children then show expand button, else hide button 
+      // (maybe api property 'hidden' is for other purpose)
+
+      if (hashItem.childrenIds.length > 0)
+        hashItem.row.hidden = false;
+
+      
 
       obj[hashItem.id] = hashItem;
       return obj;
@@ -17,8 +26,7 @@ function getSortedRows(data: htFmsItemI[]){
     return [...data].sort((a,b) => (a.code > b.code) ? 1 : ((b.code > a.code) ? -1 : 0)); 
 }
 
-function getLevel( row: htFmsItemI) {
-    if (!row.code || row.code.length === 0) return new Error('Incorrent row syntax');
+function getLevel( row: htFmsItemI): number {
     return ((<string>row.code).match(/\./g) || []).length + 1
 }
   

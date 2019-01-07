@@ -12,13 +12,13 @@
 
       
         <table mat-table
-                [dataSource]="data" >
+                [dataSource]="data$" >
 
                 <ng-container matColumnDef="{{column.name}}" *ngFor="let column of columns">
                     <th [className]="column.class" mat-header-cell *matHeaderCellDef> {{column.displayName}} </th>
                     <td [className]="column.class" mat-cell *matCellDef="let element">
                             
-                        <button *ngIf="column.expandButton" mat-icon-button>        
+                        <button *ngIf="column.expandButton && !element.hidden" mat-icon-button>        
                             <mat-icon class="mat-icon-rtl-mirror">
                                 {{element.open ? 'expand_more': 'chevron_right'  }}
                             </mat-icon>
@@ -31,7 +31,7 @@
 
 
                 <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-                <tr mat-row *matRowDef="let element; columns: columnsToDisplay;"></tr>
+                <tr (click)="toggle(element.id)" mat-row *matRowDef="let element; columns: columnsToDisplay;"></tr>
 
 
 

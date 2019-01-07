@@ -47,7 +47,7 @@ export class HierTableComponent implements OnInit, OnDestroy {
   @Input() columns: column[];
   @ViewChild(MatPaginator) paginator: MatPaginator;
   subscription: Subscription;
-  data: htFmsItemI[];
+  data$ = new BehaviorSubject<htFmsItemI[]>([]);
 
   entities: htHashTableI;
   ids: string[];
@@ -61,25 +61,31 @@ export class HierTableComponent implements OnInit, OnDestroy {
       this.subscription = this.source
       .pipe(
           map((rows: htFmsItemI[]) => 
-            toHash(rows)
-          )      
+            toHash(rows))            
       )
       .subscribe((result: htHashTableI) => {
         this.entities = result;
         this.ids = Object.keys(this.entities);
-        this.selectRootRowIds().forEach(id => this.getDescendantIds(this.output, id));
-        this.data = this.output.map( id => this.entities[id].row);
-        console.log(this.output);
+        this.render()
       });
 
 
       this.columnsToDisplay = this.columns.map(column => column.name);
   }
+
+  render() {
+    this.output.length = 0; // clear array
+    this.selectRootRowIds().forEach(id => 
+      this.getDescendantIds(this.output, id));
+    this.data$.next(this.output.map( id => this.entities[id].row));
+    console.log(this.)
+  }
+
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 
-  selectRootRowIds(): string[] {
+  selectRootRowIds(target =[]): string[] {
     return this.ids.filter( id => this.entities[id].parentId === null );
   }
 
@@ -87,10 +93,26 @@ export class HierTableComponent implements OnInit, OnDestroy {
     return this.ids.map(id => this.entities[id].row);
   }
 
+  isOpen(rowId) {
+    return this.entities[rowId].row.open
+  }
+
+
+  toggle( rowId) {
+    const open = this.entities[rowId].row.open
+    this.entities[rowId].row.open = !open;
+    this.render();
+  }
+
+
+
   getDescendantIds(descendantIds: string[], rowId: string): void {
     descendantIds.push(rowId);
-    const childrenIds = this.entities[rowId].childrenIds;
-    childrenIds.forEach( (childId: string) => this.getDescendantIds(descendantIds, childId));
+    if (this.isOpen(rowId)) {
+      this.entities[rowId].childrenIds.forEach( (childId: string) => 
+        this.getDescendantIds(descendantIds, childId));
+    }
+    
   }
   
 }
