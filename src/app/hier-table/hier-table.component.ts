@@ -78,9 +78,7 @@ export class HierTableComponent implements OnInit, OnDestroy {
   }
 
   private toHash(rows: fmsItem[]): htHashTableI {
-    const sortedRows = this.getSortedRows(rows);
-
-    return sortedRows.reduce( (obj, cur, idx, src) => {
+    return rows.reduce( (obj, cur, idx, src) => {
       const hashItem = new htHashItemC();
       hashItem.id = cur.id;
       hashItem.row = cur;
@@ -95,7 +93,6 @@ export class HierTableComponent implements OnInit, OnDestroy {
 
   private getSortedRows(data: fmsItem[]){
     return [...data].sort((a,b) => (a.code > b.code) ? 1 : ((b.code > a.code) ? -1 : 0)); 
-
   }
 
   private getLevel( row: fmsItem) {
