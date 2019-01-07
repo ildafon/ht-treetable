@@ -1,6 +1,6 @@
 import { htFmsItemI, htHashItemC, htHashTableI} from '../models';
 
-export  function ToHash (rows: htFmsItemI[]): htHashTableI {
+export  function toHash (rows: htFmsItemI[]): htHashTableI {
     return rows.reduce( (obj, cur, idx, src) => {
       const hashItem = new htHashItemC();
       hashItem.id = cur.id;

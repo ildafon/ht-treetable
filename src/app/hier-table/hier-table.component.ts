@@ -17,7 +17,7 @@ import {dataApi} from '../services/local.service';
 
 import { LocalService } from '../services/local.service';
 import { htFmsItemI, htHashItemC, htHashTableI } from '../models';
-import { ToHash } from '../utils';
+import { toHash } from '../utils';
 
 
 
@@ -57,7 +57,7 @@ export class HierTableComponent implements OnInit, OnDestroy {
       this.subscription = this.source
       .pipe(
           map((rows: htFmsItemI[]) => 
-            ToHash(rows)
+            toHash(rows)
           )      
       )
       .subscribe((result) => {
