@@ -78,7 +78,7 @@ export class HierTableComponent implements OnInit, OnDestroy {
     this.selectRootRowIds().forEach(id => 
       this.getDescendantIds(this.output, id));
     this.data$.next(this.output.map( id => this.entities[id].row));
-    console.log(this.)
+    console.log('value', this.data$.value);
   }
 
   ngOnDestroy() {

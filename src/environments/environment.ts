@@ -5,9 +5,9 @@
 export const environment = {
   production: false,
   columns: [
-    { name: 'code', displayName: 'Код', expandButton: false, class: 'code-class'},
-    { name: 'text', displayName: 'Функция', expandButton: true, class: 'text-class'},
-    { name: 'criterion', displayName: 'Состояние', expandButton: false, class: 'criterion-class'},
+    { name: 'code', displayName: 'Код', expandButton: false, class: 'code-column'},
+    { name: 'text', displayName: 'Функция', expandButton: true, class: 'text-column'},
+    { name: 'criterion', displayName: 'Состояние', expandButton: false, class: 'criterion-column'},
   ]
 };
 
