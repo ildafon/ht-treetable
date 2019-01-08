@@ -18,7 +18,7 @@ import { htFmsItemI, htHashItemC, htHashTableI, column } from '../models';
 import { toHash } from '../utils';
 
 
-
+import {HierTableDataSource} from './hier-table-datasource';
 
 
 @Component({
@@ -44,6 +44,8 @@ export class HierTableComponent implements OnInit, OnDestroy {
   @Input() source: Observable<htFmsItemI[]>;
   @Input() columns: column[];
   @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
+
   subscription: Subscription;
   data$ = new BehaviorSubject<htFmsItemI[]>([]);
   filterTextSubject$ = new BehaviorSubject<string>("");
@@ -55,9 +57,17 @@ export class HierTableComponent implements OnInit, OnDestroy {
 
   columnsToDisplay: string[];
   
+  datasource: HierTableDataSource;
+
+  constructor() {
+    
+  }
 
   ngOnInit() {   
-    
+      this.datasource = new HierTableDataSource(this.paginator, this.sort, this.source);
+      
+
+
       this.subscription = this.source
       .pipe(
           map((rows: htFmsItemI[]) => 

@@ -1,7 +1,15 @@
 import { DataSource } from '@angular/cdk/collections';
 import { MatPaginator, MatSort } from '@angular/material';
 import { map } from 'rxjs/operators';
-import { Observable, of as observableOf, merge } from 'rxjs';
+import { Observable, of as observableOf, merge, BehaviorSubject } from 'rxjs';
+
+import { htFmsItemI, column, htHashTableI } from '../models'
+
+import { environment } from '../../environments/environment';
+import { toHash } from '../utils';
+
+
+
 
 // TODO: Replace this with your own data model type
 export interface HierTableItem {
@@ -38,23 +46,73 @@ export const EXAMPLE_DATA: HierTableItem[] = [
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
-export class HierTableDataSource extends DataSource<HierTableItem> {
-  data: HierTableItem[] = EXAMPLE_DATA;
+export class HierTableDataSource extends DataSource<htFmsItemI> {
+  // data: HierTableItem[] = EXAMPLE_DATA;
+  columns: column[] 
+ 
 
-  constructor(private paginator: MatPaginator, private sort: MatSort) {
-    super();
+  entities = new BehaviorSubject<htHashTableI>({});
+  ids = new BehaviorSubject<string[]>([]);
+  output = new BehaviorSubject<string[]>([]);
+  get data(): htFmsItemI[]  { 
+    const ids = Object.keys(this.entities.value);
+    const rootIds = this.getRootRowIds(ids);
+    const output = [];
+    rootIds.forEach( id => this.getDescendantIds(output, id));
+    return output.map( id => this.entities.value[id].row); 
   }
 
+  constructor(private paginator: MatPaginator, private sort: MatSort, private source: Observable<htFmsItemI[]> ) {
+    super();
+    this.initialize();
+  }
+
+
+  private initialize() {
+    this.columns = environment.columns;
+
+    this.source
+      .pipe(
+          map((rows: htFmsItemI[]) => 
+            toHash(rows))            
+      )
+      .subscribe((result: htHashTableI) => {
+        this.entities.next(result);
+      });
+    
+  }
+
+  
+
+  private getRootRowIds(ids: string[] = []): string[] {
+    return ids.filter( id => 
+      (this.entities.value[id].parentId === null)
+      && (!this.entities.value[id].row.hidden) );
+  }
+
+  private getDescendantIds(descendantIds: string[], rowId: string): void {
+    descendantIds.push(rowId);
+    if (this.isOpen(rowId)) {
+      (<htHashTableI>this.entities.value)[rowId].childrenIds.forEach( (childId: string) => 
+        this.getDescendantIds(descendantIds, childId));
+    }
+  }
+
+  private isOpen(rowId) {
+    return this.entities.value[rowId].row.open;
+  }
+    
+  
   /**
    * Connect this data source to the table. The table will only update when
    * the returned stream emits new items.
    * @returns A stream of the items to be rendered.
    */
-  connect(): Observable<HierTableItem[]> {
+  connect(): Observable<htFmsItemI[]> {
     // Combine everything that affects the rendered data into one update
     // stream for the data-table to consume.
     const dataMutations = [
-      this.data,
+      this.entities,
       this.paginator.page,
       this.sort.sortChange
     ];
@@ -77,7 +135,7 @@ export class HierTableDataSource extends DataSource<HierTableItem> {
    * Paginate the data (client-side). If you're using server-side pagination,
    * this would be replaced by requesting the appropriate data from the server.
    */
-  private getPagedData(data: HierTableItem[]) {
+  private getPagedData(data: htFmsItemI[]) {
     const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
     return data.splice(startIndex, this.paginator.pageSize);
   }
@@ -86,7 +144,7 @@ export class HierTableDataSource extends DataSource<HierTableItem> {
    * Sort the data (client-side). If you're using server-side sorting,
    * this would be replaced by requesting the appropriate data from the server.
    */
-  private getSortedData(data: HierTableItem[]) {
+  private getSortedData(data: htFmsItemI[]) {
     if (!this.sort.active || this.sort.direction === '') {
       return data;
     }
@@ -94,8 +152,8 @@ export class HierTableDataSource extends DataSource<HierTableItem> {
     return data.sort((a, b) => {
       const isAsc = this.sort.direction === 'asc';
       switch (this.sort.active) {
-        case 'name': return compare(a.name, b.name, isAsc);
-        case 'id': return compare(+a.id, +b.id, isAsc);
+        case 'code': return compare(a.code, b.code, isAsc);
+        case 'text': return compare(a.text, b.text, isAsc);
         default: return 0;
       }
     });

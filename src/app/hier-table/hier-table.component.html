@@ -18,10 +18,13 @@
 
       
         <table mat-table
-                [dataSource]="data$" >
+                [dataSource]="datasource" matSort >
 
                 <ng-container matColumnDef="{{column.name}}" *ngFor="let column of columns">
-                    <th [ngClass]="column.class" mat-header-cell *matHeaderCellDef> {{column.displayName}} </th>
+                    <th [ngClass]="column.class" mat-header-cell 
+                    *matHeaderCellDef mat-sort-header> 
+                        {{column.displayName}} 
+                    </th>
                     <td mat-cell *matCellDef="let row" 
                         
                         htPadding="{{column.expandButton ? row.level : null }}"
