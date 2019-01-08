@@ -2,12 +2,18 @@
   <input matInput (keyup)="filterChanged($event)" placeholder="Search" >
 </mat-form-field>
 
+<div>
+    <button mat-raised-button (click)="hideAll()"> Hide all columns </button>
+</div>
+
+
 <div class="container mat-elevation-z8">
   <div class="loading-shade"
       *ngIf="isLoadingResults">
       <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
   </div>
 
+  
   <div class="table-container">
 
       
@@ -21,12 +27,12 @@
                         htPadding="{{column.expandButton ? row.level : null }}"
                         htPaddingIndent="{{column.expandButton ? column.indent : null }}">
                             
-                        <button *ngIf="column.expandButton && !row.hidden" mat-icon-button>        
+                        <button *ngIf="column.expandButton && row.hasChildren" mat-icon-button>        
                             <mat-icon class="mat-icon-rtl-mirror">
                                 {{row.open ? 'expand_more': 'chevron_right'  }}
                             </mat-icon>
                         </button>
-                        <span class="padding-block" *ngIf="column.expandButton && row.hidden"></span>
+                        <span class="padding-block" *ngIf="column.expandButton && !row.hasChildren"></span>
 
                         
                          {{row[column.name]}} 
@@ -36,7 +42,7 @@
 
                 <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
                 <tr class="row-cells" (click)="toggle(row.id)"  
-                    [@rowsAnimation]=""  
+                    [@rowsAnimation] 
                     mat-row *matRowDef="let row; columns: columnsToDisplay;">
                 </tr>
 
@@ -78,8 +84,8 @@
         <mat-paginator #paginator
           [length]="resultsLength"
           [pageIndex]="0"
-          [pageSize]="5"
-          [pageSizeOptions]="[5, 25, 50, 100, 250]">
+          [pageSize]="15"
+          [pageSizeOptions]="[5, 10, 15,  25, 50, 100, 250]">
         </mat-paginator>
 </div>  
 

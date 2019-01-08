@@ -4,19 +4,17 @@ export  function toHash (rows: htFmsItemI[]): htHashTableI {
     return rows.reduce( (obj, cur, idx, src) => {
       const hashItem = new htHashItemC();
       hashItem.id = cur.id;
-      hashItem.row = cur;
-      hashItem.row.level = getLevel(cur);
       hashItem.parentId = getParentId(cur, src);
       hashItem.childrenIds = getChildrenIds(cur, src);
-
-      // If rows has children then show expand button, else hide button 
-      // (maybe api property 'hidden' is for other purpose)
-
-      if (hashItem.childrenIds.length > 0)
-        hashItem.row.hidden = false;
-
+      hashItem.row = cur;
       
+      hashItem.row.level = getLevel(cur);
+      hashItem.row.hidden = false;
 
+      if (hashItem.childrenIds.length > 0) {
+        hashItem.row.hasChildren = true;
+      }
+        
       obj[hashItem.id] = hashItem;
       return obj;
     }, {});

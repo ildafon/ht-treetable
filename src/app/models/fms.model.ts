@@ -7,6 +7,7 @@ export interface htFmsItemI {
     open: boolean;
     flag: boolean;
     level?: number;
+    hasChildren?: boolean;
   }
 
   export interface fmsItem {

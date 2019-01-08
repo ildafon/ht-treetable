@@ -13,9 +13,7 @@ import {
   withLatestFrom
    } from 'rxjs/operators';
 
-import {dataApi} from '../services/local.service';
 
-import { LocalService } from '../services/local.service';
 import { htFmsItemI, htHashItemC, htHashTableI, column } from '../models';
 import { toHash } from '../utils';
 
@@ -66,27 +64,49 @@ export class HierTableComponent implements OnInit, OnDestroy {
       .subscribe((result: htHashTableI) => {
         this.entities = result;
         this.ids = Object.keys(this.entities);
-        this.render()
+        this.initialize()
       });
 
 
       this.columnsToDisplay = this.columns.map(column => column.name);
   }
 
+  initialize() {
+    this.render();
+    console.log('in initialize',this.data$.value);
+    this.paginator.page.subscribe( () => {
+      this.render();
+    })
+  }
+
   render() {
+
     this.output.length = 0; // clear array
-    this.selectRootRowIds().forEach(id => 
+    
+    this.getRootRowIds().forEach(id => 
       this.getDescendantIds(this.output, id));
-    this.data$.next(this.output.map( id => this.entities[id].row));
-    console.log('value', this.data$.value);
+    
+    this.paginator.length = this.output.length;
+
+    this.data$.next(this.getPagedData());
+   
+  }
+
+  private getPagedData(): htFmsItemI[] {
+    const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
+    const currentPageIds = this.output.splice(startIndex, this.paginator.pageSize);
+    return currentPageIds.map( id => this.entities[id].row);
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 
-  selectRootRowIds(target =[]): string[] {
-    return this.ids.filter( id => this.entities[id].parentId === null );
+  getRootRowIds(target =[]): string[] {
+    
+    return this.ids.filter( id => 
+      (this.entities[id].parentId === null)
+      && (!this.entities[id].row.hidden) );
   }
 
   getRows() {
@@ -114,8 +134,20 @@ export class HierTableComponent implements OnInit, OnDestroy {
     }
     
   }
-  
+
+  hideRow(id: string){
+    if (this.ids.indexOf(id) > -1 ) this.entities[id].row.hidden = true
+  }
+
+  expandAll(){}
+
+  hideAll(): void {
+      this.ids.forEach( id => this.hideRow(id))
+      this.render();
+    }   
 }
+  
+
 
 
 
