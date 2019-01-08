@@ -48,7 +48,7 @@ export const EXAMPLE_DATA: HierTableItem[] = [
  */
 export class HierTableDataSource extends DataSource<htFmsItemI> {
   // data: HierTableItem[] = EXAMPLE_DATA;
-  columns: column[] 
+  columns: column[] = environment.columns; 
  
 
   entities = new BehaviorSubject<htHashTableI>({});
@@ -69,8 +69,6 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
 
 
   private initialize() {
-    this.columns = environment.columns;
-
     this.source
       .pipe(
           map((rows: htFmsItemI[]) => 
@@ -130,6 +128,17 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
    * any open connections or free any held resources that were set up during connect.
    */
   disconnect() {}
+
+  toggle(rowId: string) {
+      const entities = this.entities.value;
+      const open = entities[rowId].row.open
+      entities[rowId].row.open = !open;
+      this.entities.next(entities);
+    }
+
+    getColumns(): column[] {
+      return this.columns;
+    }
 
   /**
    * Paginate the data (client-side). If you're using server-side pagination,

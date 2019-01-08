@@ -6,7 +6,7 @@ import { LocalService } from './services/local.service';
 import { RemoteService } from './services/remote.service';
 import { htFmsItemI,  column } from './models';
 
-import { environment } from '../environments/environment';
+
 
 
 @Component({
@@ -19,7 +19,6 @@ import { environment } from '../environments/environment';
 })
 export class AppComponent implements OnInit{
   data: Observable<htFmsItemI[]>;
-  columns: column[] = environment.columns;
   
   constructor(private dataService: LocalService) {}
 
