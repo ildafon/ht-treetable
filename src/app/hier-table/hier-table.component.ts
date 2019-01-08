@@ -46,7 +46,7 @@ export class HierTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   
-  datasource: HierTableDataSource;
+  public datasource: HierTableDataSource;
 
   columns: column[];
   columnsToDisplay: string[];

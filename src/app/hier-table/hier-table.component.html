@@ -3,7 +3,10 @@
 </mat-form-field>
 
 <div>
-    <button mat-raised-button (click)="hideAll()"> Hide all columns </button>
+    <button mat-raised-button (click)="datasource.hideAllRows()">Hide all columns</button>
+    <button mat-raised-button (click)="datasource.expandAll()">Expand all columns</button>
+    <button mat-raised-button (click)="datasource.collapseAll()">Collapse all columns</button>
+    <button mat-raised-button (click)="datasource.getAncestors(1)">Get Ancestors</button>
 </div>
 
 

@@ -23,7 +23,7 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
     const ids = Object.keys(this.hashTable.value);
     const rootIds = this.getRootRowIds(ids);
     const output = [];
-    rootIds.forEach( id => this.getDescendantIds(output, id));
+    rootIds.forEach( id => this.getVisibleDescendantIds(output, id));
     return output.map( id => this.hashTable.value[id].row); 
   }
 
@@ -80,16 +80,69 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
       && (!this.hashTable.value[id].row.hidden) );
   }
 
-  private getDescendantIds(descendantIds: string[], rowId: string): void {
-    descendantIds.push(rowId);
-    if (this.isOpen(rowId)) {
-      (<htHashTableI>this.hashTable.value)[rowId].childrenIds.forEach( (childId: string) => 
-        this.getDescendantIds(descendantIds, childId));
+  private getVisibleDescendantIds(descendantIds: string[], rowId: string): void {
+    if (this.isVisible(rowId)) {
+      descendantIds.push(rowId);
     }
+    if ( this.hasChildren(rowId) && this.isOpen(rowId)) {
+      (<htHashTableI>this.hashTable.value)[rowId].childrenIds.forEach( (childId: string) => 
+        this.getVisibleDescendantIds(descendantIds, childId));
+    }
+  }
+
+  private isVisible(rowId){
+    return !this.hashTable.value[rowId].row.hidden;
   }
 
   private isOpen(rowId) {
     return this.hashTable.value[rowId].row.open;
+  }
+
+  private hasChildren(rowId) {
+    return this.hashTable.value[rowId].row.hasChildren;
+  }
+
+  public  hideAllRows() {
+    const hashTable = this.hashTable.value;
+    const ids = Object.keys(hashTable);
+    ids.forEach( id => hashTable[id].row.hidden = true);
+    this.hashTable.next(hashTable);
+  }
+
+  public  expandAll() {
+    const hashTable = this.hashTable.value;
+    const ids = Object.keys(hashTable);
+    ids.forEach( id => {
+      const row = hashTable[id].row;
+        row.hidden = false
+        row.hasChildren ? row.open = true : null
+    })
+    this.hashTable.next(hashTable);
+  }
+
+  public collapseAll() {
+    const hashTable = this.hashTable.value;
+    const ids = Object.keys(hashTable);
+    ids.forEach( id => {
+      const row = hashTable[id].row;
+        row.hidden = false
+        row.hasChildren ? row.open = false : null
+    })
+    this.hashTable.next(hashTable);
+  }
+
+  public getAncestors(rowId: string) {
+    const hashTable = this.hashTable.value;
+    const ancestors = [];
+    if (hashTable[rowId]) {
+      let parentId = hashTable[rowId].parentId;
+      while (parentId) {
+        if (parentId) ancestors.push(parentId);
+        parentId = hashTable[parentId].parentId;
+      }
+    }
+     console.log('in getAncestor', ancestors);
+    return ancestors;
   }
 
   /**
