@@ -46,6 +46,7 @@ export class HierTableComponent implements OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   subscription: Subscription;
   data$ = new BehaviorSubject<htFmsItemI[]>([]);
+  filterTextSubject$ = new BehaviorSubject<string>("");
 
   entities: htHashTableI;
   ids: string[];
@@ -56,6 +57,7 @@ export class HierTableComponent implements OnInit, OnDestroy {
   
 
   ngOnInit() {   
+    
       this.subscription = this.source
       .pipe(
           map((rows: htFmsItemI[]) => 
@@ -74,7 +76,11 @@ export class HierTableComponent implements OnInit, OnDestroy {
   initialize() {
     this.render();
     console.log('in initialize',this.data$.value);
-    this.paginator.page.subscribe( () => {
+    merge(
+      this.paginator.page,
+      this.filterTextSubject$
+    )
+    .subscribe( () => {
       this.render();
     })
   }
@@ -144,7 +150,20 @@ export class HierTableComponent implements OnInit, OnDestroy {
   hideAll(): void {
       this.ids.forEach( id => this.hideRow(id))
       this.render();
-    }   
+  }
+  
+  filterChanged($event) {
+    
+    if ($event.keyCode == 27 ) {
+      this.hideAll();
+      this.paginator.pageIndex = 0;
+    }
+    
+      this.filterTextSubject$.next($event.target.value); 
+  }
+
+ 
+
 }
   
 
