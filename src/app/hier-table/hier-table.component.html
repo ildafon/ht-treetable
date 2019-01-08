@@ -16,14 +16,17 @@
 
                 <ng-container matColumnDef="{{column.name}}" *ngFor="let column of columns">
                     <th [ngClass]="column.class" mat-header-cell *matHeaderCellDef> {{column.displayName}} </th>
-                    <td  mat-cell *matCellDef="let row" htPadding="{{column.expandButton ? row.level : null }}">
+                    <td mat-cell *matCellDef="let row" 
+                        
+                        htPadding="{{column.expandButton ? row.level : null }}"
+                        htPaddingIndent="{{column.expandButton ? column.indent : null }}">
                             
-                        <button *ngIf="column.expandButton && !row.hidden" mat-icon-button
-                        >        
+                        <button *ngIf="column.expandButton && !row.hidden" mat-icon-button>        
                             <mat-icon class="mat-icon-rtl-mirror">
                                 {{row.open ? 'expand_more': 'chevron_right'  }}
                             </mat-icon>
                         </button>
+                        <span class="padding-block" *ngIf="column.expandButton && row.hidden"></span>
 
                         
                          {{row[column.name]}} 
@@ -32,7 +35,10 @@
 
 
                 <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-                <tr (click)="toggle(row.id)"  [@rowsAnimation]=""  mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
+                <tr class="row-cells" (click)="toggle(row.id)"  
+                    [@rowsAnimation]=""  
+                    mat-row *matRowDef="let row; columns: columnsToDisplay;">
+                </tr>
 
 
 

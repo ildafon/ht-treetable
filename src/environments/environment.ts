@@ -6,9 +6,10 @@ export const environment = {
   production: false,
   columns: [
     { name: 'code', displayName: 'Код', expandButton: false, class: 'code-column'},
-    { name: 'text', displayName: 'Функция', expandButton: true, class: 'text-column'},
+    { name: 'text', displayName: 'Функция', expandButton: true, class: 'text-column', indent: 35},
     { name: 'criterion', displayName: 'Состояние', expandButton: false, class: 'criterion-column'},
-  ]
+  ],
+  indent: 40
 };
 
 /*

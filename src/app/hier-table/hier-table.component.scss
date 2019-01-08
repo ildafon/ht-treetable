@@ -16,31 +16,29 @@
   }
   
 
-.table-container {
-    position: relative;
-    // max-height: 400px;
-    // overflow: auto;
-}
+
 
 table {
     width: 100%;
 }
 
 .code-column {
-    width: 30%;
+    width: 10%;
 }
 
 .text-column {
     padding-left: 24px;
+    width: 40%;
 }
 
-.extend-column, .extend-cell {
-    position: relative;
-    width: 0;
+.criterion-column {
+    padding-left: 24px;
+    width: 40%;
 }
 
-.extend-cell {
-    position: absolute;
+.padding-block {
+    display: inline-block;
+    min-width: 40px;
 }
 
 tr.row-cells:hover {

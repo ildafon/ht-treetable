@@ -3,6 +3,7 @@ export interface column {
     displayName: string;
     expandButton: boolean;
     class: string;
+    indent?: number;
   }
 
 

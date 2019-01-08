@@ -15,7 +15,17 @@ export class PaddingDirective  implements OnInit {
     }
 
   _level: number;
+
+  @Input('htPaddingIndent')
+    get indent(): number   { return this._indent; }
+    set indent(indent: number) {
+      if (!indent) {return;}
+      
+      this._indent = +indent
+    }
+
   _indent: number = 40;
+  
 
   constructor(
       private _el: ElementRef,
@@ -30,8 +40,8 @@ export class PaddingDirective  implements OnInit {
   }
 
  _setPadding() {
-    const padding = this.level ? `${this.level * this._indent}px` : null;
-    console.log('in setPadding Directory', this.level);
+    const padding = this.level ? `${(this._level * this._indent) - 11}px` : null;
+    console.log('in setPadding Directory', this.level, this.indent, padding);
     this._renderer.setStyle(this._el.nativeElement, 'paddingLeft', padding);
  }     
 }
