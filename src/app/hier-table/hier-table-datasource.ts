@@ -9,57 +9,22 @@ import { environment } from '../../environments/environment';
 import { toHash } from '../utils';
 
 
-
-
-// TODO: Replace this with your own data model type
-export interface HierTableItem {
-  name: string;
-  id: number;
-}
-
-// TODO: replace this with real data from your application
-export const EXAMPLE_DATA: HierTableItem[] = [
-  {id: 1, name: 'Hydrogen'},
-  {id: 2, name: 'Helium'},
-  {id: 3, name: 'Lithium'},
-  {id: 4, name: 'Beryllium'},
-  {id: 5, name: 'Boron'},
-  {id: 6, name: 'Carbon'},
-  {id: 7, name: 'Nitrogen'},
-  {id: 8, name: 'Oxygen'},
-  {id: 9, name: 'Fluorine'},
-  {id: 10, name: 'Neon'},
-  {id: 11, name: 'Sodium'},
-  {id: 12, name: 'Magnesium'},
-  {id: 13, name: 'Aluminum'},
-  {id: 14, name: 'Silicon'},
-  {id: 15, name: 'Phosphorus'},
-  {id: 16, name: 'Sulfur'},
-  {id: 17, name: 'Chlorine'},
-  {id: 18, name: 'Argon'},
-  {id: 19, name: 'Potassium'},
-  {id: 20, name: 'Calcium'},
-];
-
 /**
  * Data source for the HierTable view. This class should
  * encapsulate all logic for fetching and manipulating the displayed data
  * (including sorting, pagination, and filtering).
  */
 export class HierTableDataSource extends DataSource<htFmsItemI> {
-  // data: HierTableItem[] = EXAMPLE_DATA;
+  
   columns: column[] = environment.columns; 
- 
-
-  entities = new BehaviorSubject<htHashTableI>({});
-  ids = new BehaviorSubject<string[]>([]);
-  output = new BehaviorSubject<string[]>([]);
+  hashTable = new BehaviorSubject<htHashTableI>({});
+  
   get data(): htFmsItemI[]  { 
-    const ids = Object.keys(this.entities.value);
+    const ids = Object.keys(this.hashTable.value);
     const rootIds = this.getRootRowIds(ids);
     const output = [];
     rootIds.forEach( id => this.getDescendantIds(output, id));
-    return output.map( id => this.entities.value[id].row); 
+    return output.map( id => this.hashTable.value[id].row); 
   }
 
   constructor(private paginator: MatPaginator, private sort: MatSort, private source: Observable<htFmsItemI[]> ) {
@@ -67,40 +32,7 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
     this.initialize();
   }
 
-
-  private initialize() {
-    this.source
-      .pipe(
-          map((rows: htFmsItemI[]) => 
-            toHash(rows))            
-      )
-      .subscribe((result: htHashTableI) => {
-        this.entities.next(result);
-      });
-    
-  }
-
-  
-
-  private getRootRowIds(ids: string[] = []): string[] {
-    return ids.filter( id => 
-      (this.entities.value[id].parentId === null)
-      && (!this.entities.value[id].row.hidden) );
-  }
-
-  private getDescendantIds(descendantIds: string[], rowId: string): void {
-    descendantIds.push(rowId);
-    if (this.isOpen(rowId)) {
-      (<htHashTableI>this.entities.value)[rowId].childrenIds.forEach( (childId: string) => 
-        this.getDescendantIds(descendantIds, childId));
-    }
-  }
-
-  private isOpen(rowId) {
-    return this.entities.value[rowId].row.open;
-  }
-    
-  
+      
   /**
    * Connect this data source to the table. The table will only update when
    * the returned stream emits new items.
@@ -110,12 +42,13 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
     // Combine everything that affects the rendered data into one update
     // stream for the data-table to consume.
     const dataMutations = [
-      this.entities,
+      this.hashTable,
       this.paginator.page,
       this.sort.sortChange
     ];
 
     // Set the paginator's length
+    console.log('in connect', this.data.length);
     this.paginator.length = this.data.length;
 
     return merge(...dataMutations).pipe(map(() => {
@@ -129,22 +62,42 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
    */
   disconnect() {}
 
-  toggle(rowId: string) {
-      const entities = this.entities.value;
-      const open = entities[rowId].row.open
-      entities[rowId].row.open = !open;
-      this.entities.next(entities);
-    }
 
-    getColumns(): column[] {
-      return this.columns;
+  private initialize() {
+    this.source
+      .pipe(
+          map((rows: htFmsItemI[]) => 
+            toHash(rows))            
+      )
+      .subscribe((result: htHashTableI) => {
+        this.hashTable.next(result);
+      });    
+  }
+
+  private getRootRowIds(ids: string[] = []): string[] {
+    return ids.filter( id => 
+      (this.hashTable.value[id].parentId === null)
+      && (!this.hashTable.value[id].row.hidden) );
+  }
+
+  private getDescendantIds(descendantIds: string[], rowId: string): void {
+    descendantIds.push(rowId);
+    if (this.isOpen(rowId)) {
+      (<htHashTableI>this.hashTable.value)[rowId].childrenIds.forEach( (childId: string) => 
+        this.getDescendantIds(descendantIds, childId));
     }
+  }
+
+  private isOpen(rowId) {
+    return this.hashTable.value[rowId].row.open;
+  }
 
   /**
    * Paginate the data (client-side). If you're using server-side pagination,
    * this would be replaced by requesting the appropriate data from the server.
    */
   private getPagedData(data: htFmsItemI[]) {
+    this.paginator.length = data.length;
     const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
     return data.splice(startIndex, this.paginator.pageSize);
   }
@@ -163,9 +116,22 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
       switch (this.sort.active) {
         case 'code': return compare(a.code, b.code, isAsc);
         case 'text': return compare(a.text, b.text, isAsc);
+        case 'criterion': return compare(a.criterion, b.criterion, isAsc);
         default: return 0;
       }
     });
+  }
+
+
+  toggle(rowId: string) {
+    const hashTable = this.hashTable.value;
+    const open = hashTable[rowId].row.open
+    hashTable[rowId].row.open = !open;
+    this.hashTable.next(hashTable);
+  }
+
+  getColumns(): column[] {
+    return this.columns;
   }
 }
 
