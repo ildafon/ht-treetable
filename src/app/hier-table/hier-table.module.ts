@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { MaterialModule } from '../material.module';
 import { HierTableComponent } from './hier-table.component';
@@ -10,7 +11,9 @@ import { PaddingDirective } from './padding.directive';
   declarations: [HierTableComponent, HighlightPipe, PaddingDirective],
   imports: [
     CommonModule,
-    MaterialModule
+    MaterialModule,
+    ReactiveFormsModule,
+    FormsModule
   ],
   exports: [ HierTableComponent]
 })

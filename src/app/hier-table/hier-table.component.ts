@@ -31,8 +31,8 @@ import {HierTableDataSource} from './hier-table-datasource';
       transition('void => *', [
         style({ height: '*', opacity: '0',  'box-shadow': 'none' }),
         sequence([
-          animate(".35s ease", style({ height: '*', opacity: '.2',  'box-shadow': 'none'  })),
-          animate(".35s ease", style({ height: '*', opacity: 1  }))
+          animate(".1s ease", style({ height: '*', opacity: '.2',  'box-shadow': 'none'  })),
+          animate(".1s ease", style({ height: '*', opacity: 1  }))
         ])
       ])
     ])
@@ -51,12 +51,9 @@ export class HierTableComponent implements OnInit {
   columns: column[];
   columnsToDisplay: string[];
 
-  search: string;
-
   ngOnInit() {   
       this.datasource = new HierTableDataSource(this.paginator, this.sort, this.source);
       this.getColumns();
-      this.search = this.datasource.searchText.value;
   }
 
   toggle( rowId) {

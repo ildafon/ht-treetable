@@ -41,7 +41,6 @@ export class PaddingDirective  implements OnInit {
 
  _setPadding() {
     const padding = this.level ? `${(this._level * this._indent) - 11}px` : null;
-    // console.log('in setPadding Directory', this.level, this.indent, padding);
     this._renderer.setStyle(this._el.nativeElement, 'paddingLeft', padding);
  }     
 }

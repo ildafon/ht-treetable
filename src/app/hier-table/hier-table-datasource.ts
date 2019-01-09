@@ -19,7 +19,12 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
   columns: column[] = environment.columns; 
   hashTable = new BehaviorSubject<htHashTableI>({});
   searchText = new BehaviorSubject<string>("");
+  get search(): string  { return this.searchText.value; }
+  set search(search: string) { this.searchText.next(search) }
+  // search: string = '';
+
   searchResultIds =  new BehaviorSubject<string[]>([]);
+  // searchResultIds = [];
 
   get data(): htFmsItemI[]  { 
     const rootIds = this.getRootRowIds();
@@ -46,6 +51,7 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
     const dataMutations = [
       this.hashTable,
       this.searchResultIds,
+      // this.searchText,
       this.paginator.page,
       this.sort.sortChange
     ];
@@ -161,10 +167,15 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
       this.collapseAll();
       this.paginator.pageIndex = 0;
       this.clearSearch();
-    } else {
-      this.searchText.next($event.target.value);
-      this.searchResultIds.next(this.getSearchResultIds());
+      this.search = '';
     }
+    this.searchText.next($event.target.value);
+    const ids = this.getSearchResultIds();
+    this.searchResultIds.next(ids);
+    this.showAllRows();
+    console.log('searchChanged ids', this.searchResultIds.value); 
+    
+    
   }
 
   public clearSearch() {
@@ -174,18 +185,21 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
 
   public getSearchText() {
     return this.searchText.value;
+    // return this.searchText;
   }
 
   private getSearchResultIds() {
     const hashTable = this.hashTable.value;
-    // if (!this.searchText.value.length) return [];
+    if (this.searchText.value.length === 0) return [];
+    // if (this.searchText.length === 0) return [];
     let result = new Set();
     const ids = Object.keys(hashTable);
     const columnsSearchIn = this.columns.map( col => col.name)
     ids.filter( id => {
-        const cols = columnsSearchIn.reduce((acc,col) => 
-          acc + (hashTable[id].row[col] ? hashTable[id].row[col] : ''),'');
+        const cols = columnsSearchIn.reduce((acc,col) => acc + ' ' + (hashTable[id].row[col] ? hashTable[id].row[col] : ''),'');
+        console.log('in getSearchResultIds, cols ', cols);
           return (cols.toLocaleLowerCase().indexOf(this.searchText.value.toLocaleLowerCase()) > -1);  
+          // return (cols.toLocaleLowerCase().indexOf(this.searchText.toLocaleLowerCase()) > -1);  
     }).forEach( id => {     
       this.getAncestors(id).forEach(id => result.add(+id))
       result.add(+id);
@@ -196,9 +210,11 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
 
   private getSearchResult(data: htFmsItemI[]): htFmsItemI[]{
     if (this.searchText.value.length === 0) return data; 
-    
+    // if (this.searchText.length === 0) return data; 
+
     return data.filter( (row: htFmsItemI) => 
       this.searchResultIds.value.indexOf(row.id) > -1)
+      // this.searchResultIds.indexOf(row.id) > -1)
       .map(row => {
         if (row.hasChildren) row.open = true;
         return row;
@@ -245,6 +261,10 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
 
   getColumns(): column[] {
     return this.columns;
+  }
+
+  ping() {
+    console.log('ping');
   }
 }
 
