@@ -18,15 +18,17 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
   
   columns: column[] = environment.columns; 
   hashTable = new BehaviorSubject<htHashTableI>({});
-  
+  searchText = new BehaviorSubject<string>("");
+  searchResultIds =  new BehaviorSubject<string[]>([]);
+
   get data(): htFmsItemI[]  { 
-    const ids = Object.keys(this.hashTable.value);
-    const rootIds = this.getRootRowIds(ids);
+    const rootIds = this.getRootRowIds();
     const output = [];
     rootIds.forEach( id => this.getVisibleDescendantIds(output, id));
     return output.map( id => this.hashTable.value[id].row); 
   }
 
+  
   constructor(private paginator: MatPaginator, private sort: MatSort, private source: Observable<htFmsItemI[]> ) {
     super();
     this.initialize();
@@ -43,16 +45,18 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
     // stream for the data-table to consume.
     const dataMutations = [
       this.hashTable,
+      this.searchResultIds,
       this.paginator.page,
       this.sort.sortChange
     ];
 
     // Set the paginator's length
-    console.log('in connect', this.data.length);
+    // console.log('in connect', this.data.length);
     this.paginator.length = this.data.length;
 
     return merge(...dataMutations).pipe(map(() => {
-      return this.getPagedData(this.getSortedData([...this.data]));
+      // console.log('in connect Fired');
+      return this.getPagedData(this.getSortedData(this.getSearchResult([...this.data])));
     }));
   }
 
@@ -74,23 +78,23 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
       });    
   }
 
-  private getRootRowIds(ids: string[] = []): string[] {
-    return ids.filter( id => 
-      (this.hashTable.value[id].parentId === null)
-      && (!this.hashTable.value[id].row.hidden) );
+  private getRootRowIds(): string[] {
+    return Object.keys(this.hashTable.value).filter( id => this.hashTable.value[id].parentId === null)
   }
 
   private getVisibleDescendantIds(descendantIds: string[], rowId: string): void {
-    if (this.isVisible(rowId)) {
+    const row = this.hashTable.value[rowId].row;
+    if (!row.hidden) {
       descendantIds.push(rowId);
     }
-    if ( this.hasChildren(rowId) && this.isOpen(rowId)) {
-      (<htHashTableI>this.hashTable.value)[rowId].childrenIds.forEach( (childId: string) => 
-        this.getVisibleDescendantIds(descendantIds, childId));
+    if ( row.hasChildren && row.open) {
+      this.hashTable.value[rowId].childrenIds.forEach( (childId: string) => 
+        this.getVisibleDescendantIds(descendantIds, childId))
     }
   }
 
-  private isVisible(rowId){
+  
+  private isVisible(rowId) {
     return !this.hashTable.value[rowId].row.hidden;
   }
 
@@ -106,6 +110,13 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
     const hashTable = this.hashTable.value;
     const ids = Object.keys(hashTable);
     ids.forEach( id => hashTable[id].row.hidden = true);
+    this.hashTable.next(hashTable);
+  }
+
+  public  showAllRows() {
+    const hashTable = this.hashTable.value;
+    const ids = Object.keys(hashTable);
+    ids.forEach( id => hashTable[id].row.hidden = false);
     this.hashTable.next(hashTable);
   }
 
@@ -141,8 +152,57 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
         parentId = hashTable[parentId].parentId;
       }
     }
-     console.log('in getAncestor', ancestors);
     return ancestors;
+  }
+
+
+  public searchChanged($event) {
+    if ($event.keyCode == 27 ) {
+      this.collapseAll();
+      this.paginator.pageIndex = 0;
+      this.clearSearch();
+    } else {
+      this.searchText.next($event.target.value);
+      this.searchResultIds.next(this.getSearchResultIds());
+    }
+  }
+
+  public clearSearch() {
+    this.searchText.next('');
+    this.searchResultIds.next([]);
+  }
+
+  public getSearchText() {
+    return this.searchText.value;
+  }
+
+  private getSearchResultIds() {
+    const hashTable = this.hashTable.value;
+    // if (!this.searchText.value.length) return [];
+    let result = new Set();
+    const ids = Object.keys(hashTable);
+    const columnsSearchIn = this.columns.map( col => col.name)
+    ids.filter( id => {
+        const cols = columnsSearchIn.reduce((acc,col) => 
+          acc + (hashTable[id].row[col] ? hashTable[id].row[col] : ''),'');
+          return (cols.toLocaleLowerCase().indexOf(this.searchText.value.toLocaleLowerCase()) > -1);  
+    }).forEach( id => {     
+      this.getAncestors(id).forEach(id => result.add(+id))
+      result.add(+id);
+    })
+    return Array.from(result);
+  }
+
+
+  private getSearchResult(data: htFmsItemI[]): htFmsItemI[]{
+    if (this.searchText.value.length === 0) return data; 
+    
+    return data.filter( (row: htFmsItemI) => 
+      this.searchResultIds.value.indexOf(row.id) > -1)
+      .map(row => {
+        if (row.hasChildren) row.open = true;
+        return row;
+      })   
   }
 
   /**

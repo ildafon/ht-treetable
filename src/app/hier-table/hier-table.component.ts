@@ -51,9 +51,12 @@ export class HierTableComponent implements OnInit {
   columns: column[];
   columnsToDisplay: string[];
 
+  search: string;
+
   ngOnInit() {   
       this.datasource = new HierTableDataSource(this.paginator, this.sort, this.source);
       this.getColumns();
+      this.search = this.datasource.searchText.value;
   }
 
   toggle( rowId) {

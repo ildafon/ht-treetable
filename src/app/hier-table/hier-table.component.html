@@ -1,14 +1,21 @@
 <mat-form-field>
-  <input matInput (keyup)="filterChanged($event)" placeholder="Search" >
+  <input matInput (keyup)="datasource.searchChanged($event)" 
+        placeholder="Search" value="{{datasource.getSearchText()}}" >
+
+  <button mat-button *ngIf="datasource.searchText.value" 
+    matSuffix mat-icon-button aria-label="Clear" (click)="datasource.clearSearch()">
+        <mat-icon>close</mat-icon>
+  </button>
+
 </mat-form-field>
 
 <div>
     <button mat-raised-button (click)="datasource.hideAllRows()">Hide all columns</button>
+    <button mat-raised-button (click)="datasource.showAllRows()">Show all columns</button>
     <button mat-raised-button (click)="datasource.expandAll()">Expand all columns</button>
     <button mat-raised-button (click)="datasource.collapseAll()">Collapse all columns</button>
     <button mat-raised-button (click)="datasource.getAncestors(1)">Get Ancestors</button>
 </div>
-
 
 <div class="container mat-elevation-z8">
   <div class="loading-shade"
