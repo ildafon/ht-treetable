@@ -6,6 +6,7 @@ import {Observable} from 'rxjs';
 
 import { htFmsItemI, htHashItemC, htHashTableI, column } from './models';
 import {HierTableDataSource} from './hier-table-datasource';
+import { LocalService } from './services/local.service';
 
 @Component({
   selector: 'ht-hier-table',
@@ -17,8 +18,8 @@ import {HierTableDataSource} from './hier-table-datasource';
       transition('void => *', [
         style({ height: '*', opacity: '0',  'box-shadow': 'none' }),
         sequence([
-          animate(".1s ease", style({ height: '*', opacity: '.2',  'box-shadow': 'none'  })),
-          animate(".1s ease", style({ height: '*', opacity: 1  }))
+          animate(".2s ease", style({ height: '*', opacity: '.2',  'box-shadow': 'none'  })),
+          animate(".2s ease", style({ height: '*', opacity: 1  }))
         ])
       ])
     ])
@@ -34,7 +35,9 @@ export class HierTableComponent implements OnInit {
   
   public ds: HierTableDataSource;
 
+  constructor(public api: LocalService) {}
+
   ngOnInit() {   
-      this.ds = new HierTableDataSource(this.paginator, this.sort, this.source);
+      this.ds = new HierTableDataSource(this.paginator, this.sort, this.source, this.api);
   }
 }

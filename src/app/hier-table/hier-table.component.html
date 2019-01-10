@@ -35,15 +35,21 @@
                         htPadding="{{column.expandButton ? row.level : null }}"
                         htPaddingIndent="{{column.expandButton ? column.indent : null }}">
                             
-                        <button *ngIf="column.expandButton && row.hasChildren" (click)="ds.toggle(row.id)" mat-icon-button>        
+                        <button *ngIf="column.expandButton && (row.hasChildren || row.extend)" 
+                        (click)="ds.toggle(row.id)" mat-icon-button>        
                             <mat-icon class="mat-icon-rtl-mirror">
                                 {{row.open ? 'expand_more': 'chevron_right'  }}
                             </mat-icon>
                         </button>
-                        <span class="padding-block" *ngIf="column.expandButton && !row.hasChildren"></span>
+                        <span class="padding-block" *ngIf="column.expandButton && !row.hasChildren && !row.extend"></span>
 
                         <span [innerHTML]="row[column.name] | highlight: ds.search"></span> 
                         
+                        <mat-progress-spinner *ngIf="column.expandButton && row.open && row.loading"  
+                            class="small-spinner"
+                            mode="indeterminate"
+                            diameter="20">                            
+                        </mat-progress-spinner>
                     </td>
                 </ng-container>
 
@@ -63,3 +69,4 @@
         </mat-paginator>
 </div>  
 
+{{ ds.apiResponse | json }}

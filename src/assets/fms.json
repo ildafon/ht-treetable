@@ -1,4 +1,14 @@
 [{
+  "id": 32,
+  "code": "3",
+  "text": "Функция 3",
+  "criterion": null,
+  "hidden": false,
+  "open": false,
+  "flag": false,
+  "extend": true,
+  "loading": false
+},{
   "id": 31,
   "code": "2.4.2.1",
   "text": "действие 2.4.3",

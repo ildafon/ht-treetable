@@ -3,10 +3,11 @@ import { MatPaginator, MatSort } from '@angular/material';
 import { map } from 'rxjs/operators';
 import { Observable, of as observableOf, merge, BehaviorSubject } from 'rxjs';
 
-import { htFmsItemI, column, htHashTableI } from './models'
+import { htFmsItemI, column, htHashTableI, htHashItemC } from './models'
 
 import { environment } from '../../environments/environment';
 import { toHash } from './utils';
+import { LocalService } from './services/local.service';
 
 
 /**
@@ -27,6 +28,9 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
   columns: column[] = environment.columns;
   columnsToDisplay: string[];
 
+  sourceRows: htFmsItemI[];
+  extendData: Observable<htFmsItemI[]>;
+
   get data(): htFmsItemI[]  { 
     const rootIds = this.getRootRowIds();
     const output = [];
@@ -34,18 +38,23 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
     return output.map( id => this.hashTable.value[id].row); 
   }
   
-  constructor(private paginator: MatPaginator, private sort: MatSort, private source: Observable<htFmsItemI[]> ) {
-    super();
-    this.initialize();
+  constructor(
+    private paginator: MatPaginator, 
+    private sort: MatSort, 
+    private source: Observable<htFmsItemI[]>,
+    private api: LocalService ) {
+      super();
+      this.initialize(this.source);
+      this.columnsToDisplay = this.columns.map( column => column.name);
   }
 
-  private initialize() {
-    this.columnsToDisplay = this.columns.map( column => column.name);
-
-    this.source
+  private initialize(source: Observable<htFmsItemI[]>) {
+    source
       .pipe(
-          map((rows: htFmsItemI[]) => 
-            toHash(rows))            
+          map((rows: htFmsItemI[]) => {
+            this.sourceRows = rows;
+            return toHash(rows)
+          }) 
       )
       .subscribe((result: htHashTableI) => {
         this.hashTable.next(result);
@@ -64,17 +73,14 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
     const dataMutations = [
       this.hashTable,
       this.searchResultIds,
-      // this.searchText,
       this.paginator.page,
       this.sort.sortChange
     ];
 
     // Set the paginator's length
-    // console.log('in connect', this.data.length);
     this.paginator.length = this.data.length;
 
     return merge(...dataMutations).pipe(map(() => {
-      // console.log('in connect Fired');
       return this.getPagedData(this.getSortedData(this.getSearchResult([...this.data])));
     }));
   }
@@ -150,11 +156,12 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
     const ids = Object.keys(hashTable);
     ids.forEach( id => {
       const row = hashTable[id].row;
-        row.hidden = false
-        row.hasChildren ? row.open = false : null
+        row.hidden = false;
+        (row.hasChildren || row.extend) ? row.open = false : null
     })
     this.hashTable.next(hashTable);
     this.expandedAll = false;
+    
   }
 
   public getAncestors(rowId: string) {
@@ -254,10 +261,13 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
   }
 
   toggle(rowId: string) {
-    const hashTable = this.hashTable.value;
-    const open = hashTable[rowId].row.open
-    hashTable[rowId].row.open = !open;
-    this.hashTable.next(hashTable);
+    let ht = this.hashTable.value;
+    
+    if (ht[rowId].row.extend && !ht[rowId].row.open) this.extendRow(rowId);
+
+    ht[rowId].row.open = !ht[rowId].row.open;
+    this.hashTable.next(ht);
+    
   }
 
   toggleAll() {
@@ -266,6 +276,36 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
 
   getColumns(): column[] {
     return this.columns;
+  }
+
+  extendRow(rowId: string) {
+    let ht = this.hashTable.value;
+    ht[rowId].row.loading = true;
+    this.hashTable.next(ht);
+    
+    // Demo delay 3s
+    setTimeout(() => {
+      const hashTable = this.hashTable.value;
+      
+      this.api.getLazyData(rowId).pipe(
+        map((rows: htFmsItemI[]) => {
+          this.sourceRows = this.sourceRows.concat(rows.filter( row => {
+            return this.sourceRows.findIndex(item => item.id === row.id) < 0
+          }))             
+          return toHash(this.sourceRows)
+        })            
+      )
+      .subscribe( (result: htHashTableI) => {
+        this.hashTable.next(result);
+      });
+      
+      let ht = this.hashTable.value;
+      ht[rowId].row.loading = false;
+      this.hashTable.next(ht)
+    }, 3000);
+
+
+    
   }
 }
 

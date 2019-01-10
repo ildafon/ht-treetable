@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { fmsItem } from '../models/fms.model';
+import { htFmsItemI } from '../models/fms.model';
 
 export interface dataApi {
   items: any[]
@@ -14,19 +14,14 @@ export class LocalService {
   
   constructor(private http: HttpClient) { }
 
-  getData(): Observable<dataApi> {
-    const href = '/assets/example-data.json'
-    return this.http.get<dataApi>(href);
-  }
 
-  getPartialData(id: string): Observable<dataApi> {
-    const href = `/assets/example-data${id}.json`
-    return this.http.get<dataApi>(href);
-  }
-
-
-  getFMSData(): Observable<fmsItem[]> {
+  getFMSData(): Observable<htFmsItemI[]> {
     const href = `/assets/fms.json`
-    return this.http.get<fmsItem[]>(href);
+    return this.http.get<htFmsItemI[]>(href);
+  }
+
+  getLazyData(id: string): Observable<htFmsItemI[]> {
+    const href = `/assets/extend${id}.json`
+    return this.http.get<htFmsItemI[]>(href);
   }
 }

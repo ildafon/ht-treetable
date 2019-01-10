@@ -8,6 +8,8 @@ export interface htFmsItemI {
     flag: boolean;
     level?: number;
     hasChildren?: boolean;
+    extend?: boolean;
+    loading?: boolean;
   }
 
   export interface fmsItem {
