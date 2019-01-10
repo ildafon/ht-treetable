@@ -1,25 +1,11 @@
-import { v4 as uuid } from 'uuid';
-
 import { Component, OnInit, Input, ViewChild, OnDestroy } from '@angular/core';
 import {animate, state, style, transition, trigger, sequence} from '@angular/animations';
 
 import { MatPaginator, MatSort, MatTable} from '@angular/material';
-import {merge, Observable, of as observableOf, BehaviorSubject, Subscription} from 'rxjs';
-import {
-  catchError, 
-  map, 
-  startWith, 
-  switchMap, 
-  withLatestFrom
-   } from 'rxjs/operators';
+import {Observable} from 'rxjs';
 
-
-import { htFmsItemI, htHashItemC, htHashTableI, column } from '../models';
-import { toHash } from '../utils';
-
-
+import { htFmsItemI, htHashItemC, htHashTableI, column } from './models';
 import {HierTableDataSource} from './hier-table-datasource';
-
 
 @Component({
   selector: 'ht-hier-table',
@@ -46,28 +32,9 @@ export class HierTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   
-  public datasource: HierTableDataSource;
-
-  columns: column[];
-  columnsToDisplay: string[];
+  public ds: HierTableDataSource;
 
   ngOnInit() {   
-      this.datasource = new HierTableDataSource(this.paginator, this.sort, this.source);
-      this.getColumns();
+      this.ds = new HierTableDataSource(this.paginator, this.sort, this.source);
   }
-
-  toggle( rowId) {
-    this.datasource.toggle(rowId);
-  }
-
-  getColumns() {
-    this.columns = this.datasource.getColumns();
-    this.columnsToDisplay = this.columns.map(column => column.name)
-  }
-
 }
-  
-
-
-
-

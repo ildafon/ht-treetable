@@ -1,7 +1,10 @@
 <mat-form-field class="search-class">
-  <input matInput  type="text"  placeholder="Search" (keyup)="datasource.searchChanged($event)" 
-   [(ngModel)]="datasource.search" (focus)="datasource.hideAllRows()" (blur)="datasource.showAllRows()">
-   <button mat-button *ngIf="datasource.search" matSuffix mat-icon-button aria-label="Clear" (click)="datasource.search=''">
+  <input matInput  type="text"  placeholder="Search" 
+   (keyup)="ds.searchChanged($event)" 
+   [(ngModel)]="ds.search" 
+   (focus)="ds.hideAllRows()" 
+   (blur)="ds.onBlurSearch()">
+   <button mat-button *ngIf="ds.search" matSuffix mat-icon-button aria-label="Clear" (click)="ds.search=''">
     <mat-icon>close</mat-icon>
   </button>
 </mat-form-field>
@@ -14,11 +17,17 @@
   
   <div class="table-container">     
         <table mat-table
-                [dataSource]="datasource" matSort >
+                [dataSource]="ds" matSort >
 
-                <ng-container matColumnDef="{{column.name}}" *ngFor="let column of columns">
+                <ng-container matColumnDef="{{column.name}}" *ngFor="let column of ds.columns">
                     <th [ngClass]="column.class" mat-header-cell 
-                    *matHeaderCellDef mat-sort-header> 
+                    *matHeaderCellDef>
+                    <button *ngIf="column.expandButton" 
+                        mat-icon-button (click)="ds.toggleAll()">        
+                        <mat-icon class="mat-icon-rtl-mirror">
+                            {{ds.expandedAll ? 'expand_more': 'chevron_right'  }}
+                        </mat-icon>
+                    </button>
                         {{column.displayName}} 
                     </th>
                     <td mat-cell *matCellDef="let row" 
@@ -26,23 +35,23 @@
                         htPadding="{{column.expandButton ? row.level : null }}"
                         htPaddingIndent="{{column.expandButton ? column.indent : null }}">
                             
-                        <button *ngIf="column.expandButton && row.hasChildren" mat-icon-button>        
+                        <button *ngIf="column.expandButton && row.hasChildren" (click)="toggle(row.id)" mat-icon-button>        
                             <mat-icon class="mat-icon-rtl-mirror">
                                 {{row.open ? 'expand_more': 'chevron_right'  }}
                             </mat-icon>
                         </button>
                         <span class="padding-block" *ngIf="column.expandButton && !row.hasChildren"></span>
 
-                        <span [innerHTML]="row[column.name] | highlight: datasource.search"></span> 
+                        <span [innerHTML]="row[column.name] | highlight: ds.search"></span> 
                         
                     </td>
                 </ng-container>
 
 
-                <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-                <tr class="row-cells" (click)="toggle(row.id)"  
+                <tr mat-header-row *matHeaderRowDef="ds.columnsToDisplay"></tr>
+                <tr class="row-cells"   
                     [@rowsAnimation] 
-                    mat-row *matRowDef="let row; columns: columnsToDisplay;">
+                    mat-row *matRowDef="let row; columns: ds.columnsToDisplay;">
                 </tr>
         </table>
   </div>

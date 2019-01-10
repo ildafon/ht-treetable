@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { dataApi } from './services/local.service';
-import { LocalService } from './services/local.service';
-import { RemoteService } from './services/remote.service';
-import { htFmsItemI,  column } from './models';
+import { dataApi } from './hier-table/services/local.service';
+import { LocalService } from './hier-table/services/local.service';
+import { RemoteService } from './hier-table/services/remote.service';
+import { htFmsItemI,  column } from './hier-table/models';
 
 
 
