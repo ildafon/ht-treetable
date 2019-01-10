@@ -33,7 +33,6 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
     rootIds.forEach( id => this.getVisibleDescendantIds(output, id));
     return output.map( id => this.hashTable.value[id].row); 
   }
-
   
   constructor(private paginator: MatPaginator, private sort: MatSort, private source: Observable<htFmsItemI[]> ) {
     super();
