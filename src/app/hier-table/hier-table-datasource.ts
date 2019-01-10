@@ -264,7 +264,7 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
     let ht = this.hashTable.value;
     
     if (ht[rowId].row.extend && !ht[rowId].row.open) this.extendRow(rowId);
-
+    ht[rowId].row.extend = false;
     ht[rowId].row.open = !ht[rowId].row.open;
     this.hashTable.next(ht);
     
@@ -301,6 +301,7 @@ export class HierTableDataSource extends DataSource<htFmsItemI> {
       
       let ht = this.hashTable.value;
       ht[rowId].row.loading = false;
+      
       this.hashTable.next(ht)
     }, 3000);
 
