@@ -35,7 +35,7 @@
                         htPadding="{{column.expandButton ? row.level : null }}"
                         htPaddingIndent="{{column.expandButton ? column.indent : null }}">
                             
-                        <button *ngIf="column.expandButton && row.hasChildren" (click)="toggle(row.id)" mat-icon-button>        
+                        <button *ngIf="column.expandButton && row.hasChildren" (click)="ds.toggle(row.id)" mat-icon-button>        
                             <mat-icon class="mat-icon-rtl-mirror">
                                 {{row.open ? 'expand_more': 'chevron_right'  }}
                             </mat-icon>
