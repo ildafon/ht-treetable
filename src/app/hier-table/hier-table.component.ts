@@ -4,7 +4,7 @@ import {animate, state, style, transition, trigger, sequence} from '@angular/ani
 import { MatPaginator, MatSort, MatTable} from '@angular/material';
 import {Observable} from 'rxjs';
 
-import { htFmsItemI, htHashItemC, htHashTableI, column } from './models';
+import { htFmsItem } from './models';
 import {HierTableDataSource} from './hier-table-datasource';
 import { LocalService } from './services/local.service';
 
@@ -28,7 +28,7 @@ import { LocalService } from './services/local.service';
 })
 export class HierTableComponent implements OnInit {
   
-  @Input() source: Observable<htFmsItemI[]>;
+  @Input() source: Observable<htFmsItem[]>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;

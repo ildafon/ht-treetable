@@ -1,4 +1,4 @@
-export interface htFmsItemI {
+export interface htFmsItem {
     id: string;
     code: string;
     text: string;
@@ -12,24 +12,14 @@ export interface htFmsItemI {
     loading?: boolean;
   }
 
-  export interface fmsItem {
+export class htHashItem {
     id: string;
-    code: string;
-    text: string;
-    criterion: string | null;
-    hidden: boolean;
-    open: boolean;
-    flag: boolean;
-  }
-
-
-export class htHashItemC {
-    id: string;
-    row: htFmsItemI;
+    row: htFmsItem;
     parentId: string | null;
     childrenIds: string[] = []; 
 }
 
-export interface htHashTableI {
-  [id:string]: htHashItemC
+
+export interface htHashTable {
+  [id:string]: htHashItem;
 }

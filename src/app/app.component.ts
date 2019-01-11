@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 import { dataApi } from './hier-table/services/local.service';
 import { LocalService } from './hier-table/services/local.service';
 import { RemoteService } from './hier-table/services/remote.service';
-import { htFmsItemI,  column } from './hier-table/models';
+import { htFmsItem } from './hier-table/models';
 
 
 
@@ -18,7 +18,7 @@ import { htFmsItemI,  column } from './hier-table/models';
   ]
 })
 export class AppComponent implements OnInit{
-  data: Observable<htFmsItemI[]>;
+  data: Observable<htFmsItem[]>;
   
   constructor(private dataService: LocalService) {}
 

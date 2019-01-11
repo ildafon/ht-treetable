@@ -1,7 +1,7 @@
 [{
   "id": 32,
   "code": "3",
-  "text": "Функция 3",
+  "text": "Функция 3 (dynamic)",
   "criterion": null,
   "hidden": false,
   "open": false,
