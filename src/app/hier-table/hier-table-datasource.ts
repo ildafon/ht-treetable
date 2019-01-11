@@ -30,8 +30,7 @@ export class HierTableDataSource extends DataSource<htFmsItem> {
   columnsToDisplay: string[];
 
   sourceRows: htFmsItem[];
-  extendData: Observable<htFmsItem[]>;
-
+  
   get data(): htFmsItem[]  { 
     const output = [];
     this.rootRowIds.forEach( id => this.getVisibleDescendantIds(output, id));
@@ -92,8 +91,6 @@ export class HierTableDataSource extends DataSource<htFmsItem> {
    */
   disconnect() {}
 
-
-  
 
   private getRootRowIds(hashTable: htHashTable): string[] {
     return Object.keys(hashTable).filter( id => hashTable[id].parentId === null)
